@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Leaf } from 'lucide-vue-next'
+import { Leaf, MessageSquare, Monitor, Layers } from 'lucide-vue-next'
 import EnvironmentPanel from './components/EnvironmentPanel.vue'
 import EcoHealthSphere from './components/EcoHealthSphere.vue'
 import BiodiversityStars from './components/BiodiversityStars.vue'
@@ -10,7 +10,10 @@ import SensorDensityChart from './components/SensorDensityChart.vue'
 import WarningChart from './components/WarningChart.vue'
 import CommunityValueChart from './components/CommunityValueChart.vue'
 import WaterCycleChart from './components/WaterCycleChart.vue'
+import PretextOptimizedBubbles from './components/PretextOptimizedBubbles.vue'
+import PretextBIDashboard from './components/PretextBIDashboard.vue'
 
+const currentPage = ref<'dashboard' | 'pretext' | 'biv2'>('dashboard')
 const updateTime = ref('')
 const serverDelay = ref(12)
 
@@ -47,42 +50,94 @@ onUnmounted(() => {
             </h1>
           </div>
         </div>
-        <EnvironmentPanel />
+        
+        <div class="flex items-center gap-4">
+          <div class="flex bg-gray-800/50 rounded-lg p-1">
+            <button
+              @click="currentPage = 'dashboard'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
+                currentPage === 'dashboard'
+                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/25'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              ]"
+            >
+              <Monitor class="w-4 h-4" />
+              大屏视图
+            </button>
+            <button
+              @click="currentPage = 'pretext'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
+                currentPage === 'pretext'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              ]"
+            >
+              <MessageSquare class="w-4 h-4" />
+              Pretext 示例
+            </button>
+            <button
+              @click="currentPage = 'biv2'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
+                currentPage === 'biv2'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              ]"
+            >
+              <Layers class="w-4 h-4" />
+              BIV2 视图
+            </button>
+          </div>
+          <EnvironmentPanel />
+        </div>
       </div>
     </header>
 
     <main class="flex-1 flex flex-col gap-1.5 overflow-hidden">
-      <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
-        <div class="col-span-3 h-full min-h-0">
-          <EcoHealthSphere />
+      <template v-if="currentPage === 'dashboard'">
+        <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
+          <div class="col-span-3 h-full min-h-0">
+            <EcoHealthSphere />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <BiodiversityStars />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <GrowthRhythmChart />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <MicroClimateChart />
+          </div>
         </div>
-        <div class="col-span-3 h-full min-h-0">
-          <BiodiversityStars />
+        <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
+          <div class="col-span-3 h-full min-h-0">
+            <SensorDensityChart />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <WarningChart />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <CommunityValueChart />
+          </div>
+          <div class="col-span-3 h-full min-h-0">
+            <WaterCycleChart />
+          </div>
         </div>
-        <div class="col-span-3 h-full min-h-0">
-          <GrowthRhythmChart />
+      </template>
+      
+      <template v-else-if="currentPage === 'pretext'">
+        <div class="flex-1 min-h-0">
+          <PretextOptimizedBubbles />
         </div>
-        <div class="col-span-3 h-full min-h-0">
-          <MicroClimateChart />
+      </template>
+      
+      <template v-else-if="currentPage === 'biv2'">
+        <div class="flex-1 min-h-0 p-0 m-0">
+          <PretextBIDashboard />
         </div>
-      </div>
-      <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
-        <div class="col-span-3 h-full min-h-0">
-          <SensorDensityChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <WarningChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <CommunityValueChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <WaterCycleChart />
-        </div>
-      </div>
+      </template>
     </main>
 
-    <footer class="h-[55px] flex-shrink-0 mt-1.5">
+    <footer v-if="currentPage !== 'biv2'" class="h-[55px] flex-shrink-0 mt-1.5">
       <div class="h-full glass-panel rounded-xl p-3">
         <div class="h-full flex items-center justify-between text-sm text-gray-400">
           <div class="flex items-center gap-4">
