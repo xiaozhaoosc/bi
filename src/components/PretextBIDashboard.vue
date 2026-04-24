@@ -2,7 +2,6 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
 import * as echarts from 'echarts'
-import MicroClimateChart from './MicroClimateChart.vue'
 import SensorDensityChart from './SensorDensityChart.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
@@ -255,7 +254,7 @@ onUnmounted(() => {
       <div class="grid grid-cols-12 gap-8 flex-1 min-h-0">
         <!-- Left Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-2 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -286,7 +285,7 @@ onUnmounted(() => {
             <div class="flex flex-col gap-2 mb-4 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性丰度</span>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性</span>
               </div>
               <div class="flex flex-col gap-1 mt-2 text-xs">
                 <div class="flex items-center gap-2">
@@ -476,9 +475,31 @@ onUnmounted(() => {
 
           </div>
 
-          <!-- 底部信息栏：微气候平衡度 + AI预警 + 多媒体区域 -->
+          <!-- 底部信息栏：仪表 + AI预警 + 多媒体区域 -->
           <div class="absolute bottom-0 inset-x-0 flex gap-3 z-30">
-            <MicroClimateChart class="flex-1" />
+            <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">仪表</span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400 text-xs">微气候平衡度</span>
+                  <span class="text-eco-green-400 font-mono text-sm font-bold">85%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400 text-xs">光合效率</span>
+                  <span class="text-eco-green-400 font-mono text-sm font-bold">72.0%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400 text-xs">CO₂浓度</span>
+                  <span class="text-smart-blue-400 font-mono text-sm font-bold">450ppm</span>
+                </div>
+                <div class="mt-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-eco-green-500 to-eco-green-400 rounded-full transition-all duration-1000" style="width: 85%"></div>
+                </div>
+              </div>
+            </section>
             
             <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
               <div class="flex items-center gap-2 mb-2">
@@ -498,8 +519,15 @@ onUnmounted(() => {
                   <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>
                   <span>土壤 pH 偏移预警</span>
                 </div>
+                <div class="flex items-center gap-2 text-yellow-400/80 bg-yellow-500/5 px-2 py-1 rounded-lg">
+                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>
+                  <span>光照强度不足</span>
+                </div>
                 <div class="text-gray-400 pl-2 text-[10px] mt-0.5 border-l-2 border-red-500/30">
                   建议: 开启 3 号区自动化排灌系统
+                </div>
+                <div class="text-gray-400 pl-2 text-[10px] border-l-2 border-yellow-500/30">
+                  建议: 调整遮阳网角度至 45°
                 </div>
               </div>
             </section>
@@ -530,7 +558,7 @@ onUnmounted(() => {
 
         <!-- Right Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-[2] flex flex-col overflow-hidden border-t border-white/20 relative">
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-4 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -553,9 +581,9 @@ onUnmounted(() => {
 
           </section>
 
-          <div class="flex-1 min-h-[180px]">
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <SensorDensityChart />
-          </div>
+          </section>
         </aside>
       </div>
 
