@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Leaf, MessageSquare, Monitor } from 'lucide-vue-next'
+import { Leaf, MessageSquare, Monitor, Layers } from 'lucide-vue-next'
 import EnvironmentPanel from './components/EnvironmentPanel.vue'
 import EcoHealthSphere from './components/EcoHealthSphere.vue'
 import BiodiversityStars from './components/BiodiversityStars.vue'
@@ -11,8 +11,9 @@ import WarningChart from './components/WarningChart.vue'
 import CommunityValueChart from './components/CommunityValueChart.vue'
 import WaterCycleChart from './components/WaterCycleChart.vue'
 import PretextOptimizedBubbles from './components/PretextOptimizedBubbles.vue'
+import PretextBIDashboard from './components/PretextBIDashboard.vue'
 
-const currentPage = ref<'dashboard' | 'pretext'>('dashboard')
+const currentPage = ref<'dashboard' | 'pretext' | 'biv2'>('dashboard')
 const updateTime = ref('')
 const serverDelay = ref(12)
 
@@ -74,6 +75,17 @@ onUnmounted(() => {
               <MessageSquare class="w-4 h-4" />
               Pretext 示例
             </button>
+            <button
+              @click="currentPage = 'biv2'"
+              :class="['flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all',
+                currentPage === 'biv2'
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              ]"
+            >
+              <Layers class="w-4 h-4" />
+              BIV2 视图
+            </button>
           </div>
           <EnvironmentPanel />
         </div>
@@ -117,9 +129,15 @@ onUnmounted(() => {
           <PretextOptimizedBubbles />
         </div>
       </template>
+      
+      <template v-else-if="currentPage === 'biv2'">
+        <div class="flex-1 min-h-0 p-0 m-0">
+          <PretextBIDashboard />
+        </div>
+      </template>
     </main>
 
-    <footer class="h-[55px] flex-shrink-0 mt-1.5">
+    <footer v-if="currentPage !== 'biv2'" class="h-[55px] flex-shrink-0 mt-1.5">
       <div class="h-full glass-panel rounded-xl p-3">
         <div class="h-full flex items-center justify-between text-sm text-gray-400">
           <div class="flex items-center gap-4">
