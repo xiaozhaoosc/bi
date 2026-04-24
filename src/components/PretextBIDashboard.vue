@@ -115,7 +115,12 @@ const initCharts = () => {
 
   const growthChartDom = document.getElementById('growthChart')
   if (growthChartDom) {
-    growthChart = echarts.init(growthChartDom)
+    const rect = growthChartDom.getBoundingClientRect()
+    if (rect.width > 0 && rect.height > 0) {
+      growthChart = echarts.init(growthChartDom)
+    } else {
+      growthChart = echarts.init(growthChartDom, undefined, { width: 300, height: 200 })
+    }
     growthChart.setOption({
       backgroundColor: 'transparent',
       grid: { top: 20, bottom: 30, left: 40, right: 10 },
@@ -371,11 +376,6 @@ onUnmounted(() => {
               <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
                 AI 决策建议
               </div>
-            </div>
-            
-            <!-- Tron Light Flow Overlay -->
-            <div class="absolute inset-x-6 top-20 bottom-6 opacity-40 pointer-events-none">
-              <LightFlow :intensity="80" color="#00ff88" />
             </div>
 
             <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
