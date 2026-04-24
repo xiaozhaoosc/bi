@@ -23,6 +23,8 @@ const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
 const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
 const currentRole = ref<'researcher' | 'investor' | 'consumer'>('researcher')
+const currentTimelineIndex = ref<number>(0)
+// 当前选中的时空时间轴节气索引，默认0 (谷雨)
 const roles = [
   { id: 'researcher', name: '研究者', icon: Cpu, desc: '专注生态技术指标' },
   { id: 'investor', name: '投资者', icon: Zap, desc: '关注资产与社会价值' },

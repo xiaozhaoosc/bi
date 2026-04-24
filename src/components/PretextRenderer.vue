@@ -23,17 +23,42 @@ const renderedLines = ref<any[]>([])
 const FONT_DEFAULT = '14px "Noto Sans SC", sans-serif'
 
 const doLayout = async () => {
+  // Guard against missing text data to avoid layout errors
   if (props.segments) {
-    const prepared = prepareWithSegments(
-      props.segments.map(s => s.text).join(''),
-      props.baseFont || FONT_DEFAULT
-    ) as any
-    const { lines } = layoutWithLines(prepared, props.maxWidth || 1000, props.lineHeight || 1.5)
-    renderedLines.value = lines
-  } else if (props.text) {
-    const prepared = prepare(props.text, props.baseFont || FONT_DEFAULT) as any
-    const { lines } = layoutWithLines(prepared, props.maxWidth || 1000, props.lineHeight || 1.5)
-    renderedLines.value = lines
+    const textJoined = props.segments.map(s => String(s?.text ?? '')).join('')
+    if (!textJoined || textJoined.trim().length === 0) {
+      renderedLines.value = []
+      return
+    }
+    try {
+      const prepared = prepareWithSegments(
+        textJoined,
+        props.baseFont || FONT_DEFAULT
+      ) as any
+      const res: any = layoutWithLines(prepared, props.maxWidth || 1000, props.lineHeight || 1.5)
+      const lines = res?.lines
+      renderedLines.value = Array.isArray(lines) ? lines : []
+    } catch (e) {
+      console.error('PretextRenderer layout error (segments):', e)
+      renderedLines.value = []
+    }
+  } else if (typeof props.text === 'string' && props.text.length > 0) {
+    const text = props.text
+    if (!text || text.trim().length === 0) {
+      renderedLines.value = []
+      return
+    }
+    try {
+      const prepared = prepare(text, props.baseFont || FONT_DEFAULT) as any
+      const res: any = layoutWithLines(prepared, props.maxWidth || 1000, props.lineHeight || 1.5)
+      const lines = res?.lines
+      renderedLines.value = Array.isArray(lines) ? lines : []
+    } catch (e) {
+      console.error('PretextRenderer layout error (text):', e)
+      renderedLines.value = []
+    }
+  } else {
+    renderedLines.value = []
   }
 }
 
