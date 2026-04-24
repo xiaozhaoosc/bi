@@ -510,17 +510,22 @@ onUnmounted(() => {
             <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
               <div class="flex items-center gap-2 mb-2">
                 <div class="w-1 h-4 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
-                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">多媒体区域</span>
-              </div>
-              <div class="flex items-center justify-center h-20 bg-white/5 border border-dashed border-white/15 rounded-xl relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-smart-blue-500/5 to-eco-green-500/5"></div>
-                <div class="relative flex flex-col items-center gap-1">
-                  <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="2" y="4" width="20" height="16" rx="2"/>
-                    <polygon points="10,8 16,12 10,16" fill="currentColor" opacity="0.5"/>
-                  </svg>
-                  <span class="text-gray-500 text-[10px]">宣传视频 / 图片展示区</span>
+                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">茶园实况</span>
+                <div class="ml-auto flex items-center gap-1">
+                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                  <span class="text-red-400 text-[10px] font-mono">REC</span>
                 </div>
+              </div>
+              <div class="relative rounded-xl overflow-hidden bg-black/40" style="aspect-ratio: 16/9;">
+                <video
+                  src="/videos/茶园茶山.mp4"
+                  autoplay
+                  loop
+                  muted
+                  playsinline
+                  class="w-full h-full object-cover"
+                ></video>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
               </div>
             </section>
           </div>
