@@ -2,6 +2,8 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
 import * as echarts from 'echarts'
+import MicroClimateChart from './MicroClimateChart.vue'
+import SensorDensityChart from './SensorDensityChart.vue'
 import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
 import TimelineSlider from './visuals/TimelineSlider.vue'
@@ -31,14 +33,12 @@ watch(currentTimelineIndex, (newIdx) => {
   const data = seasonalData[newIdx]
   if (ecoChart) ecoChart.setOption({ series: [{ data: [{ value: data.ecoRadar }] }] })
   if (diversityChart) diversityChart.setOption({ series: [{ data: data.diversity }] })
-  if (climateChart) climateChart.setOption({ series: [{ data: [{ value: data.climate }] }] })
 })
 
 // 图表实例
 let ecoChart: echarts.ECharts | null = null
 let diversityChart: echarts.ECharts | null = null
 let growthChart: echarts.ECharts | null = null
-let climateChart: echarts.ECharts | null = null
 
 const toggleFullscreen = () => {
   if (!isFullscreen.value) {
@@ -136,21 +136,6 @@ const initCharts = () => {
       }
     }]
   })
-
-  climateChart = echarts.init(document.getElementById('climateChart'))
-  climateChart.setOption({
-    series: [{
-      type: 'gauge',
-      radius: '90%',
-      progress: { show: true, width: 12, itemStyle: { color: '#00d4ff' } },
-      axisLine: { lineStyle: { width: 12, color: [[1, '#111']] } },
-      axisTick: { show: false },
-      splitLine: { show: false },
-      axisLabel: { show: false },
-      detail: { fontSize: 24, color: '#fff', offsetCenter: [0, '30%'], formatter: '{value}%' },
-      data: [{ value: 82.5 }]
-    }]
-  })
 }
 
 const handleResize = () => {
@@ -158,7 +143,6 @@ const handleResize = () => {
   ecoChart?.resize()
   diversityChart?.resize()
   growthChart?.resize()
-  climateChart?.resize()
 }
 
 onMounted(() => {
@@ -176,7 +160,6 @@ onUnmounted(() => {
   ecoChart?.dispose()
   diversityChart?.dispose()
   growthChart?.dispose()
-  climateChart?.dispose()
 })
 </script>
 
@@ -271,13 +254,22 @@ onUnmounted(() => {
         <!-- Center Stage -->
         <main class="col-span-6 relative perspective-lg preserve-3d">
           <div class="absolute inset-0 flex items-center justify-center">
-            <!-- Background Image -->
+            <!-- 3D Tea Garden Model -->
             <div class="absolute inset-0 flex items-center justify-center">
-              <img 
-                src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
-                alt="Tea Garden Digital Twin" 
-                class="max-w-[80%] max-h-[80%] object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
-              />
+              <div class="relative w-[600px] h-[600px] flex items-center justify-center">
+                <img 
+                  src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
+                  alt="Tea Garden Digital Twin" 
+                  class="max-w-full max-h-full object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
+                />
+                <!-- Digital Grid Overlay -->
+                <div class="absolute inset-0 pointer-events-none">
+                  <div class="w-full h-full border border-eco-green-400/30 rounded-lg"></div>
+                  <div class="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none">
+                    <div v-for="i in 100" :key="i" class="border border-eco-green-400/10"></div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Pretext Bubbles -->
@@ -367,13 +359,7 @@ onUnmounted(() => {
 
           </section>
 
-          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20">
-            <div class="flex items-center gap-2 mb-6">
-              <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-              <span class="text-earth-gold-400 font-bold text-lg tracking-wider">微气候平衡度</span>
-            </div>
-            <div id="climateChart" class="flex-1 min-h-0"></div>
-          </section>
+          <MicroClimateChart />
 
           <section class="glass-panel rounded-3xl p-6 border-t border-white/20 relative">
             <div class="flex items-center gap-2 mb-4">
@@ -390,6 +376,8 @@ onUnmounted(() => {
               </div>
             </div>
           </section>
+
+          <SensorDensityChart />
         </aside>
       </div>
 
