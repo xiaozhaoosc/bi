@@ -62,7 +62,7 @@ onMounted(() => {
         :style="{
           width: glyph?.width + 'px',
           font: glyph?.font,
-          color: (glyph as any)?.segmentIndex !== undefined && (segments?.[(glyph as any).segmentIndex]) ? (segments[(glyph as any).segmentIndex].color || 'inherit') : 'inherit'
+          color: (glyph as any)?.segmentIndex !== undefined && props?.segments?.[(glyph as any).segmentIndex] ? (props.segments[(glyph as any).segmentIndex].color || 'inherit') : 'inherit'
         }"
       >
         {{ glyph?.char || '' }}

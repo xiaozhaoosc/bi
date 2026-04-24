@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Fullscreen, Minimize2, Cpu, Leaf, Zap, Activity, Users } from 'lucide-vue-next'
+import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
 import * as echarts from 'echarts'
-import CarbonTree from './visuals/CarbonTree.vue'
-import RootNetwork from './visuals/RootNetwork.vue'
 import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
 import TimelineSlider from './visuals/TimelineSlider.vue'
@@ -272,86 +270,60 @@ onUnmounted(() => {
 
         <!-- Center Stage -->
         <main class="col-span-6 relative perspective-lg preserve-3d">
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <!-- Central Hologram Graphic (Abstract) -->
-            <div class="relative w-[600px] h-[600px] flex items-center justify-center transform-gpu animate-float">
-               <!-- Carbon Sequestration Tree -->
-               <div class="absolute w-64 h-80 bottom-24 left-1/2 -translate-x-1/2 opacity-80" style="transform: translateZ(50px)">
-                  <CarbonTree :value="124.5" color="#00ff88" />
-               </div>
-               
-               <!-- Underground Network (Root) -->
-               <div class="absolute w-full h-40 bottom-0 left-0 opacity-40 blur-[1px]" style="transform: rotateX(70deg) translateZ(-50px)">
-                  <RootNetwork :health="92" color="#00d4ff" />
-               </div>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <!-- Background Image -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <img 
+                src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
+                alt="Tea Garden Digital Twin" 
+                class="max-w-[80%] max-h-[80%] object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
+              />
+            </div>
 
-               <!-- Floating HUD Points -->
-               <div class="absolute inset-0">
-                  <div class="absolute top-1/4 left-1/4 animate-pulse">
-                    <div class="w-2 h-2 bg-eco-green-400 rounded-full shadow-[0_0_10px_#00ff88]"></div>
+            <!-- Pretext Bubbles -->
+            <div class="absolute inset-0 pointer-events-none">
+              <!-- Top Left Bubble -->
+              <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2">
+                <div class="glass-panel p-6 rounded-2xl border border-eco-green-400/30 shadow-[0_0_30px_rgba(0,255,136,0.3)] backdrop-blur-md">
+                  <span class="text-eco-green-400 mb-2 block font-['Noto_Sans_SC'] text-base">碳汇贡献值</span>
+                  <div class="block">
+                    <span class="font-['Orbitron'] font-bold text-2xl text-eco-green-400">124.5</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-eco-green-400"> t</span>
                   </div>
-                  <div class="absolute bottom-1/3 right-1/4 animate-pulse-slow">
-                    <div class="w-2 h-2 bg-smart-blue-400 rounded-full shadow-[0_0_10px_#00d4ff]"></div>
+                </div>
+              </div>
+
+              <!-- Top Right Bubble -->
+              <div class="absolute top-1/4 right-1/4 transform translate-x-1/2 -translate-y-1/2">
+                <div class="glass-panel p-6 rounded-2xl border border-smart-blue-400/30 shadow-[0_0_30px_rgba(0,212,255,0.3)] backdrop-blur-md">
+                  <span class="text-smart-blue-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">水资源智慧循环</span>
+                  <div class="block text-right">
+                    <span class="font-['Orbitron'] font-bold text-2xl text-smart-blue-400">98.2</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-smart-blue-400"> %</span>
                   </div>
-               </div>
-            </div>
-
-            <!-- HUD Cards from backup with precise animations -->
-            <div 
-              class="hud-card top-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-eco-green-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-            >
-
-              <div class="flex items-center gap-2 mb-2">
-                <Leaf class="w-4 h-4 text-eco-green-500" />
-                <span class="text-eco-green-500 opacity-70 tracking-widest text-sm">立体碳汇总量</span>
-              </div>
-              <div>
-                <span class="font-['Orbitron'] font-bold text-2xl text-white">124.5</span>
-                <span class="text-['Noto_Sans_SC'] text-base text-eco-green-500"> 吨/年</span>
+                </div>
               </div>
 
-            </div>
-
-            <div 
-              class="hud-card top-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-smart-blue-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-            >
-
-              <div class="flex items-center justify-end gap-2 mb-2">
-                <span class="text-smart-blue-400 opacity-70 tracking-widest text-sm">光合能量效率</span>
-                <Zap class="w-4 h-4 text-smart-blue-400" />
-              </div>
-              <div class="text-right">
-                <span class="font-['Orbitron'] font-bold text-2xl text-white">88.2</span>
-                <span class="text-['Noto_Sans_SC'] text-base text-smart-blue-400"> %</span>
-              </div>
-            </div>
-
-            <div 
-              class="hud-card bottom-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-earth-gold-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-            >
-
-              <div class="flex items-center gap-2 mb-2">
-                <Activity class="w-4 h-4 text-earth-gold-500" />
-                <span class="text-earth-gold-500 opacity-70 tracking-widest text-sm">水资源循环率</span>
-              </div>
-              <div>
-                <span class="font-['Orbitron'] font-bold text-2xl text-white">98.2</span>
-                <span class="text-['Noto_Sans_SC'] text-base text-earth-gold-500"> %</span>
+              <!-- Bottom Left Bubble -->
+              <div class="absolute bottom-1/4 left-1/4 transform -translate-x-1/2 translate-y-1/2">
+                <div class="glass-panel p-6 rounded-2xl border border-earth-gold-400/30 shadow-[0_0_30px_rgba(255,204,51,0.3)] backdrop-blur-md">
+                  <span class="text-earth-gold-400 mb-2 block font-['Noto_Sans_SC'] text-base">光合效率指数</span>
+                  <div class="block">
+                    <span class="font-['Orbitron'] font-bold text-2xl text-earth-gold-400">85.0</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-earth-gold-400"> %</span>
+                  </div>
+                </div>
               </div>
 
-            </div>
-
-            <div 
-              class="hud-card bottom-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-purple-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-            >
-
-              <div class="flex items-center justify-end gap-2 mb-2">
-                <span class="text-purple-400 opacity-70 tracking-widest text-sm">社区共生价值</span>
-                <Users class="w-4 h-4 text-purple-400" />
-              </div>
-              <div class="text-right">
-                <span class="font-['Orbitron'] font-bold text-2xl text-white">320</span>
-                <span class="text-['Noto_Sans_SC'] text-base text-purple-400"> 万元</span>
+              <!-- Bottom Right Bubble -->
+              <div class="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2">
+                <div class="glass-panel p-6 rounded-2xl border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.3)] backdrop-blur-md">
+                  <span class="text-purple-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">社区共生价值</span>
+                  <div class="block text-right">
+                    <span class="font-['Orbitron'] font-bold text-2xl text-purple-400">320</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-purple-400"> 万</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -359,7 +331,7 @@ onUnmounted(() => {
             <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
 
             <!-- Time-space Travel Slider -->
-            <div class="absolute bottom-4 w-[600px] z-30" style="transform: translateZ(100px)">
+            <div class="absolute bottom-4 w-[600px] z-30">
                <TimelineSlider :options="timelineOptions" v-model="currentTimelineIndex" />
             </div>
           </div>
