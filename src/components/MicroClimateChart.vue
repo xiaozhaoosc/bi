@@ -245,25 +245,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="glass-panel rounded-3xl p-4 border-t border-white/20 relative">
-    <div class="flex items-center gap-2 mb-3">
+  <section class="glass-panel rounded-3xl p-4 border-t border-white/20 relative h-full">
+    <div class="flex items-center gap-2 mb-2">
       <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
       <span class="text-earth-gold-400 font-bold text-base tracking-wider">微气候平衡度</span>
     </div>
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-12 h-12 flex items-center justify-center">
-          <div class="text-2xl font-bold text-smart-blue-400">{{ balance }}%</div>
+    <div class="flex items-center gap-3">
+      <div class="text-2xl font-bold text-smart-blue-400">{{ balance }}%</div>
+      <div class="flex flex-col gap-1 text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></div>
+          <span class="text-gray-400">光照: <span class="text-earth-gold-400 font-bold">{{ light.toFixed(1) }}%</span></span>
         </div>
-        <div class="flex flex-col gap-1 text-xs">
-          <div class="flex items-center gap-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></div>
-            <span class="text-gray-400">光照: <span class="text-earth-gold-400 font-bold">{{ light.toFixed(1) }}%</span></span>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="w-1.5 h-1.5 rounded-full bg-eco-green-500 animate-pulse" style="animation-delay: 0.3s"></div>
-            <span class="text-gray-400">CO₂: <span class="text-eco-green-400 font-bold">{{ co2.toFixed(0) }}ppm</span></span>
-          </div>
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-eco-green-500 animate-pulse" style="animation-delay: 0.3s"></div>
+          <span class="text-gray-400">CO₂: <span class="text-eco-green-400 font-bold">{{ co2.toFixed(0) }}ppm</span></span>
         </div>
       </div>
     </div>

@@ -35,6 +35,27 @@ watch(currentTimelineIndex, (newIdx) => {
   if (diversityChart) diversityChart.setOption({ series: [{ data: data.diversity }] })
 })
 
+// 气泡动态数据
+const bubbleData = ref({
+  carbon: { value: 124.5, trend: 3.2, unit: 't', label: '碳汇贡献值' },
+  water: { value: 98.2, trend: 1.5, unit: '%', label: '水资源智慧循环' },
+  photo: { value: 85.0, trend: -0.8, unit: '%', label: '光合效率指数' },
+  community: { value: 320, trend: 5.6, unit: '万', label: '社区共生价值' }
+})
+
+// 气泡数值动态波动
+const animateBubbleValues = () => {
+  const fluctuate = (base: number, range: number) =>
+    Math.round((base + (Math.random() - 0.5) * range) * 10) / 10
+
+  bubbleData.value = {
+    carbon: { ...bubbleData.value.carbon, value: fluctuate(124.5, 4), trend: fluctuate(3.2, 1) },
+    water: { ...bubbleData.value.water, value: fluctuate(98.2, 1), trend: fluctuate(1.5, 0.5) },
+    photo: { ...bubbleData.value.photo, value: fluctuate(85.0, 2), trend: fluctuate(-0.8, 0.6) },
+    community: { ...bubbleData.value.community, value: fluctuate(320, 8), trend: fluctuate(5.6, 2) }
+  }
+}
+
 // 图表实例
 let ecoChart: echarts.ECharts | null = null
 let diversityChart: echarts.ECharts | null = null
@@ -176,6 +197,7 @@ onMounted(() => {
   updateTime()
   updateScale()
   setInterval(updateTime, 1000)
+  setInterval(animateBubbleValues, 5000)
   window.addEventListener('resize', handleResize)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
   
@@ -263,8 +285,6 @@ onUnmounted(() => {
             <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/10 rounded-br-lg"></div>
           </section>
 
-          <MicroClimateChart />
-
           <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex flex-col gap-2 mb-4 relative z-10">
               <div class="flex items-center gap-2">
@@ -311,48 +331,144 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Pretext Bubbles -->
+            <!-- Pretext Bubbles - 增强版 -->
             <div class="absolute inset-0 pointer-events-none">
-              <!-- Top Left Bubble -->
-              <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-eco-green-400/30 shadow-[0_0_30px_rgba(0,255,136,0.3)] backdrop-blur-md">
-                  <span class="text-eco-green-400 mb-2 block font-['Noto_Sans_SC'] text-base">碳汇贡献值</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-eco-green-400">124.5</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-eco-green-400"> t</span>
+              <!-- SVG 连接线动画层 -->
+              <svg class="absolute inset-0 w-full h-full" viewBox="0 0 960 800" preserveAspectRatio="xMidYMid meet">
+                <!-- 左上气泡连接线 -->
+                <line x1="240" y1="200" x2="480" y2="400" stroke="rgba(0,255,136,0.3)" stroke-width="1.5" stroke-dasharray="6 4">
+                  <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2s" repeatCount="indefinite" />
+                </line>
+                <circle r="3" fill="#00ff88" opacity="0.8">
+                  <animateMotion dur="2s" repeatCount="indefinite" path="M240,200 L480,400" />
+                </circle>
+                <!-- 右上气泡连接线 -->
+                <line x1="720" y1="200" x2="480" y2="400" stroke="rgba(0,212,255,0.3)" stroke-width="1.5" stroke-dasharray="6 4">
+                  <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2.5s" repeatCount="indefinite" />
+                </line>
+                <circle r="3" fill="#00d4ff" opacity="0.8">
+                  <animateMotion dur="2.5s" repeatCount="indefinite" path="M720,200 L480,400" />
+                </circle>
+                <!-- 左下气泡连接线 -->
+                <line x1="240" y1="580" x2="480" y2="400" stroke="rgba(255,204,51,0.3)" stroke-width="1.5" stroke-dasharray="6 4">
+                  <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="2.2s" repeatCount="indefinite" />
+                </line>
+                <circle r="3" fill="#ffcc33" opacity="0.8">
+                  <animateMotion dur="2.2s" repeatCount="indefinite" path="M240,580 L480,400" />
+                </circle>
+                <!-- 右下气泡连接线 -->
+                <line x1="720" y1="580" x2="480" y2="400" stroke="rgba(168,85,247,0.3)" stroke-width="1.5" stroke-dasharray="6 4">
+                  <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1.8s" repeatCount="indefinite" />
+                </line>
+                <circle r="3" fill="#a855f7" opacity="0.8">
+                  <animateMotion dur="1.8s" repeatCount="indefinite" path="M720,580 L480,400" />
+                </circle>
+              </svg>
+
+              <!-- 左上气泡：碳汇贡献值 -->
+              <div class="absolute top-[18%] left-[12%] pretext-bubble pretext-bubble-green">
+                <div class="glass-panel p-5 rounded-2xl border border-eco-green-400/30 shadow-[0_0_30px_rgba(0,255,136,0.3)] backdrop-blur-md min-w-[180px]">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 rounded-full bg-eco-green-400 animate-pulse shadow-[0_0_6px_#00ff88]"></div>
+                    <span class="text-eco-green-400 font-['Noto_Sans_SC'] text-sm font-medium">碳汇贡献值</span>
+                  </div>
+                  <div class="flex items-baseline gap-1">
+                    <span class="font-['Orbitron'] font-bold text-3xl text-eco-green-400">{{ bubbleData.carbon.value }}</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-base text-eco-green-400/70">{{ bubbleData.carbon.unit }}</span>
+                  </div>
+                  <div class="flex items-center gap-1 mt-1.5">
+                    <svg class="w-3 h-3" :class="bubbleData.carbon.trend >= 0 ? 'text-eco-green-400' : 'text-red-400'" viewBox="0 0 12 12" fill="currentColor">
+                      <path v-if="bubbleData.carbon.trend >= 0" d="M6 2L10 8H2L6 2Z" />
+                      <path v-else d="M6 10L2 4H10L6 10Z" />
+                    </svg>
+                    <span class="text-xs" :class="bubbleData.carbon.trend >= 0 ? 'text-eco-green-400' : 'text-red-400'">
+                      {{ bubbleData.carbon.trend >= 0 ? '+' : '' }}{{ bubbleData.carbon.trend }}%
+                    </span>
+                    <span class="text-gray-500 text-[10px] ml-1">较上季</span>
+                  </div>
+                  <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-eco-green-500 to-eco-green-400 rounded-full transition-all duration-1000" style="width: 78%"></div>
                   </div>
                 </div>
               </div>
 
-              <!-- Top Right Bubble -->
-              <div class="absolute top-1/4 right-1/4 transform translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-smart-blue-400/30 shadow-[0_0_30px_rgba(0,212,255,0.3)] backdrop-blur-md">
-                  <span class="text-smart-blue-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">水资源智慧循环</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-smart-blue-400">98.2</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-smart-blue-400"> %</span>
+              <!-- 右上气泡：水资源智慧循环 -->
+              <div class="absolute top-[18%] right-[12%] pretext-bubble pretext-bubble-blue">
+                <div class="glass-panel p-5 rounded-2xl border border-smart-blue-400/30 shadow-[0_0_30px_rgba(0,212,255,0.3)] backdrop-blur-md min-w-[180px]">
+                  <div class="flex items-center justify-end gap-2 mb-2">
+                    <span class="text-smart-blue-400 font-['Noto_Sans_SC'] text-sm font-medium">水资源智慧循环</span>
+                    <div class="w-2 h-2 rounded-full bg-smart-blue-400 animate-pulse shadow-[0_0_6px_#00d4ff]"></div>
+                  </div>
+                  <div class="flex items-baseline justify-end gap-1">
+                    <span class="font-['Orbitron'] font-bold text-3xl text-smart-blue-400">{{ bubbleData.water.value }}</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-base text-smart-blue-400/70">{{ bubbleData.water.unit }}</span>
+                  </div>
+                  <div class="flex items-center justify-end gap-1 mt-1.5">
+                    <span class="text-gray-500 text-[10px] mr-1">较上季</span>
+                    <span class="text-xs" :class="bubbleData.water.trend >= 0 ? 'text-smart-blue-400' : 'text-red-400'">
+                      {{ bubbleData.water.trend >= 0 ? '+' : '' }}{{ bubbleData.water.trend }}%
+                    </span>
+                    <svg class="w-3 h-3" :class="bubbleData.water.trend >= 0 ? 'text-smart-blue-400' : 'text-red-400'" viewBox="0 0 12 12" fill="currentColor">
+                      <path v-if="bubbleData.water.trend >= 0" d="M6 2L10 8H2L6 2Z" />
+                      <path v-else d="M6 10L2 4H10L6 10Z" />
+                    </svg>
+                  </div>
+                  <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-smart-blue-500 to-smart-blue-400 rounded-full transition-all duration-1000" style="width: 92%"></div>
                   </div>
                 </div>
               </div>
 
-              <!-- Bottom Left Bubble -->
-              <div class="absolute bottom-1/4 left-1/4 transform -translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-earth-gold-400/30 shadow-[0_0_30px_rgba(255,204,51,0.3)] backdrop-blur-md">
-                  <span class="text-earth-gold-400 mb-2 block font-['Noto_Sans_SC'] text-base">光合效率指数</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-earth-gold-400">85.0</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-earth-gold-400"> %</span>
+              <!-- 左下气泡：光合效率指数 -->
+              <div class="absolute bottom-[28%] left-[12%] pretext-bubble pretext-bubble-gold">
+                <div class="glass-panel p-5 rounded-2xl border border-earth-gold-400/30 shadow-[0_0_30px_rgba(255,204,51,0.3)] backdrop-blur-md min-w-[180px]">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-2 h-2 rounded-full bg-earth-gold-400 animate-pulse shadow-[0_0_6px_#ffcc33]"></div>
+                    <span class="text-earth-gold-400 font-['Noto_Sans_SC'] text-sm font-medium">光合效率指数</span>
+                  </div>
+                  <div class="flex items-baseline gap-1">
+                    <span class="font-['Orbitron'] font-bold text-3xl text-earth-gold-400">{{ bubbleData.photo.value }}</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-base text-earth-gold-400/70">{{ bubbleData.photo.unit }}</span>
+                  </div>
+                  <div class="flex items-center gap-1 mt-1.5">
+                    <svg class="w-3 h-3" :class="bubbleData.photo.trend >= 0 ? 'text-earth-gold-400' : 'text-red-400'" viewBox="0 0 12 12" fill="currentColor">
+                      <path v-if="bubbleData.photo.trend >= 0" d="M6 2L10 8H2L6 2Z" />
+                      <path v-else d="M6 10L2 4H10L6 10Z" />
+                    </svg>
+                    <span class="text-xs" :class="bubbleData.photo.trend >= 0 ? 'text-earth-gold-400' : 'text-red-400'">
+                      {{ bubbleData.photo.trend >= 0 ? '+' : '' }}{{ bubbleData.photo.trend }}%
+                    </span>
+                    <span class="text-gray-500 text-[10px] ml-1">较上季</span>
+                  </div>
+                  <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-earth-gold-500 to-earth-gold-400 rounded-full transition-all duration-1000" style="width: 65%"></div>
                   </div>
                 </div>
               </div>
 
-              <!-- Bottom Right Bubble -->
-              <div class="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.3)] backdrop-blur-md">
-                  <span class="text-purple-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">社区共生价值</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-purple-400">320</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-purple-400"> 万</span>
+              <!-- 右下气泡：社区共生价值 -->
+              <div class="absolute bottom-[28%] right-[12%] pretext-bubble pretext-bubble-purple">
+                <div class="glass-panel p-5 rounded-2xl border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.3)] backdrop-blur-md min-w-[180px]">
+                  <div class="flex items-center justify-end gap-2 mb-2">
+                    <span class="text-purple-400 font-['Noto_Sans_SC'] text-sm font-medium">社区共生价值</span>
+                    <div class="w-2 h-2 rounded-full bg-purple-400 animate-pulse shadow-[0_0_6px_#a855f7]"></div>
+                  </div>
+                  <div class="flex items-baseline justify-end gap-1">
+                    <span class="font-['Orbitron'] font-bold text-3xl text-purple-400">{{ bubbleData.community.value }}</span>
+                    <span class="font-['Noto_Sans_SC'] font-bold text-base text-purple-400/70">{{ bubbleData.community.unit }}</span>
+                  </div>
+                  <div class="flex items-center justify-end gap-1 mt-1.5">
+                    <span class="text-gray-500 text-[10px] mr-1">较上季</span>
+                    <span class="text-xs" :class="bubbleData.community.trend >= 0 ? 'text-purple-400' : 'text-red-400'">
+                      {{ bubbleData.community.trend >= 0 ? '+' : '' }}{{ bubbleData.community.trend }}%
+                    </span>
+                    <svg class="w-3 h-3" :class="bubbleData.community.trend >= 0 ? 'text-purple-400' : 'text-red-400'" viewBox="0 0 12 12" fill="currentColor">
+                      <path v-if="bubbleData.community.trend >= 0" d="M6 2L10 8H2L6 2Z" />
+                      <path v-else d="M6 10L2 4H10L6 10Z" />
+                    </svg>
+                  </div>
+                  <div class="mt-2 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-1000" style="width: 85%"></div>
                   </div>
                 </div>
               </div>
@@ -361,7 +477,52 @@ onUnmounted(() => {
             <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
             <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
 
+          </div>
 
+          <!-- 底部信息栏：微气候平衡度 + AI预警 + 多媒体区域 -->
+          <div class="absolute bottom-0 inset-x-0 flex gap-3 z-30">
+            <MicroClimateChart class="flex-1" />
+            
+            <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-1 h-4 bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
+                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">AI 预警中枢</span>
+                <div class="ml-auto flex items-center gap-1">
+                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                  <span class="text-red-400 text-[10px] font-mono">LIVE</span>
+                </div>
+              </div>
+              <div class="flex flex-col gap-1.5 text-xs">
+                <div class="flex items-center gap-2 text-red-400 bg-red-500/10 px-2 py-1 rounded-lg">
+                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
+                  <span>局部湿度异常 (提前量: 45min)</span>
+                </div>
+                <div class="flex items-center gap-2 text-yellow-400/80 bg-yellow-500/5 px-2 py-1 rounded-lg">
+                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>
+                  <span>土壤 pH 偏移预警</span>
+                </div>
+                <div class="text-gray-400 pl-2 text-[10px] mt-0.5 border-l-2 border-red-500/30">
+                  建议: 开启 3 号区自动化排灌系统
+                </div>
+              </div>
+            </section>
+
+            <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-1 h-4 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">多媒体区域</span>
+              </div>
+              <div class="flex items-center justify-center h-20 bg-white/5 border border-dashed border-white/15 rounded-xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-smart-blue-500/5 to-eco-green-500/5"></div>
+                <div class="relative flex flex-col items-center gap-1">
+                  <svg class="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <polygon points="10,8 16,12 10,16" fill="currentColor" opacity="0.5"/>
+                  </svg>
+                  <span class="text-gray-500 text-[10px]">宣传视频 / 图片展示区</span>
+                </div>
+              </div>
+            </section>
           </div>
         </main>
 
@@ -390,23 +551,7 @@ onUnmounted(() => {
 
           </section>
 
-          <section class="glass-panel rounded-3xl p-6 border-t border-white/20 relative">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-              <span class="text-earth-gold-400 font-bold text-lg tracking-wider">AI 预警中枢</span>
-            </div>
-            <div class="flex flex-col gap-1 text-xs">
-              <div class="flex items-center gap-2 text-red-400">
-                <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                <span>局部湿度异常 (提前量: 45min)</span>
-              </div>
-              <div class="text-gray-400 pl-3.5 mt-1">
-                建议: 开启 3 号区自动化排灌系统
-              </div>
-            </div>
-          </section>
-
-          <div class="flex-1 min-h-0">
+          <div class="flex-1 min-h-[180px]">
             <SensorDensityChart />
           </div>
         </aside>
@@ -519,5 +664,42 @@ onUnmounted(() => {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+.pretext-bubble {
+  animation: pretextFloat 4s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+.pretext-bubble-green { animation-delay: 0s; }
+.pretext-bubble-blue { animation-delay: -1s; }
+.pretext-bubble-gold { animation-delay: -2s; }
+.pretext-bubble-purple { animation-delay: -3s; }
+
+@keyframes pretextFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.pretext-bubble::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pretext-bubble-green::before {
+  background: linear-gradient(135deg, rgba(0,255,136,0.2), transparent 60%);
+}
+.pretext-bubble-blue::before {
+  background: linear-gradient(225deg, rgba(0,212,255,0.2), transparent 60%);
+}
+.pretext-bubble-gold::before {
+  background: linear-gradient(135deg, rgba(255,204,51,0.2), transparent 60%);
+}
+.pretext-bubble-purple::before {
+  background: linear-gradient(225deg, rgba(168,85,247,0.2), transparent 60%);
 }
 </style>
