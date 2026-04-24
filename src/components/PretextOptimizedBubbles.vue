@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { prepareWithSegments, walkLineRanges, layoutWithLines } from '@chenglou/pretext'
 
 interface Bubble {
@@ -14,16 +14,15 @@ const FONT_SIZE = '14px "Noto Sans SC", sans-serif'
 const MAX_WIDTH = 400
 const LINE_HEIGHT = 20
 const PADDING_HORIZONTAL = 16
-const PADDING_VERTICAL = 8
 
 const bubbles = ref<Bubble[]>([
-  { id: 1, text: 'Yo did you see the new Pretext library?', isUser: true, cssWidth: null, pretextWidth: null },
-  { id: 2, text: 'yeah! It measures text without the DOM. Pure JavaScript arithmetic', isUser: false, cssWidth: null, pretextWidth: null },
-  { id: 3, text: 'That shrinkwrap demo is wild it finds the exact minimum width for multiline text. CSS can\'t do that.', isUser: true, cssWidth: null, pretextWidth: null },
-  { id: 4, text: '성능 최적화가 정말 많이 되었더라고요 🎉', isUser: false, cssWidth: null, pretextWidth: null },
-  { id: 5, text: 'Oh wow it handles CJK and emoji too??', isUser: true, cssWidth: null, pretextWidth: null },
-  { id: 6, text: 'كل شيء! Mixed bidi, grapheme clusters, whatever you want. Try resizing', isUser: false, cssWidth: null, pretextWidth: null },
-  { id: 7, text: 'the best part: zero layout reflow. You could shrinkwrap 10,000 bubbles and the browser wouldn\'t even blink', isUser: true, cssWidth: null, pretextWidth: null }
+  { id: 1, text: '嘿，你看到新的 Pretext 库了吗？', isUser: true, cssWidth: null, pretextWidth: null },
+  { id: 2, text: '看到了！它不需要 DOM 就能测量文本，纯 JavaScript 算力。', isUser: false, cssWidth: null, pretextWidth: null },
+  { id: 3, text: '那个收缩包装（Shrinkwrap）演示太强了，它能找到多行文本的精确最小宽度。CSS 做不到这一点。', isUser: true, cssWidth: null, pretextWidth: null },
+  { id: 4, text: '是的，性能优化做得非常到位 🎉', isUser: false, cssWidth: null, pretextWidth: null },
+  { id: 5, text: '哇，它对中文、韩文和表情符号的支持也这么好？', isUser: true, cssWidth: null, pretextWidth: null },
+  { id: 6, text: '全支持！混合双向文本、字符簇，随心所欲。试试调整窗口大小。', isUser: false, cssWidth: null, pretextWidth: null },
+  { id: 7, text: '最棒的是：零布局重排。即使你对 10,000 个气泡进行宽度计算，浏览器也不会卡顿。', isUser: true, cssWidth: null, pretextWidth: null }
 ])
 
 const calculateWidths = () => {

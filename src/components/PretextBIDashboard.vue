@@ -1,14 +1,70 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Fullscreen, Minimize2, Maximize2, Info, Thermometer, Droplets, Cloud, Clock, Shield, Flower2, TrendingUp, Sun, AlertTriangle, Users } from 'lucide-vue-next'
-import { prepare, layout, prepareWithSegments, walkLineRanges } from '@chenglou/pretext'
+import { Fullscreen, Minimize2, Thermometer, Droplets, Cloud, Clock, Shield, Flower2, Sun, Users, Activity, Cpu, AlertTriangle, Leaf, Zap } from 'lucide-vue-next'
 import * as echarts from 'echarts'
+import PretextRenderer from './PretextRenderer.vue'
+import CarbonTree from './visuals/CarbonTree.vue'
+import RootNetwork from './visuals/RootNetwork.vue'
+import LightFlow from './visuals/LightFlow.vue'
+import EcoScanner from './visuals/EcoScanner.vue'
+import ValueRing from './visuals/ValueRing.vue'
+import TimelineSlider from './visuals/TimelineSlider.vue'
+import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
-const FONT = '14px "Noto Sans SC", sans-serif'
+const FONT_TITLE = 'bold 32px "Noto Sans SC", sans-serif'
+const FONT_LABEL = '12px "Noto Sans SC", sans-serif'
+const FONT_VALUE = 'bold 24px "Orbitron", sans-serif'
+const FONT_UNIT = '14px "Noto Sans SC", sans-serif'
 
 // 状态管理
 const isFullscreen = ref(false)
 const currentTime = ref('')
+const dashboardRef = ref<HTMLElement | null>(null)
+const scale = ref(1)
+const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
+const currentRole = ref<'researcher' | 'investor' | 'consumer'>('researcher')
+const roles = [
+  { id: 'researcher', name: '研究者', icon: Cpu, desc: '专注生态技术指标' },
+  { id: 'investor', name: '投资者', icon: Zap, desc: '关注资产与社会价值' },
+  { id: 'consumer', name: '消费者', icon: Leaf, desc: '追溯品质与健康指数' }
+] as const
+
+// 底部卡片响应式数据
+const footerData = ref([
+  {icon: Shield, title: '生态健康指数', value: 94.5, display: '94.5', unit: '分', color: 'text-eco-green-400', glow: 'shadow-eco-green-500/10', valColor: '#00ff88'},
+  {icon: Flower2, title: '生物多样性丰度', value: 84, display: '42', unit: '种', color: 'text-earth-gold-400', glow: 'shadow-earth-gold-500/10', valColor: '#ffcc33'},
+  {icon: Sun, title: '微气候平衡度', value: 82.5, display: '82.5', unit: '%', color: 'text-smart-blue-400', glow: 'shadow-smart-blue-500/10', valColor: '#00d4ff'},
+  {icon: Users, title: '社会价值贡献', value: 80, display: '320', unit: '万', color: 'text-purple-400', glow: 'shadow-purple-500/10', valColor: '#a855f7'}
+])
+
+// 模拟不同节气的数据
+const seasonalData = [
+  // 谷雨 (Q1)
+  { ecoRadar: [75, 82, 90, 85, 80], diversity: [10, 30, 90, 60], climate: 72.5, footerValues: [85.0, 32, 72.5, 280] },
+  // 立夏 (Q2)
+  { ecoRadar: [80, 88, 95, 88, 85], diversity: [12, 35, 100, 70], climate: 78.0, footerValues: [90.5, 38, 78.0, 300] },
+  // 小满 (Q3)
+  { ecoRadar: [82, 90, 96, 89, 86], diversity: [14, 40, 110, 75], climate: 80.5, footerValues: [92.0, 40, 80.5, 310] },
+  // 芒种 (Q4)
+  { ecoRadar: [85, 92, 98, 90, 88], diversity: [15, 45, 120, 80], climate: 82.5, footerValues: [94.5, 42, 82.5, 320] }
+]
+
+watch(currentTimelineIndex, (newIdx) => {
+  const data = seasonalData[newIdx]
+  if (ecoChart) ecoChart.setOption({ series: [{ data: [{ value: data.ecoRadar }] }] })
+  if (diversityChart) diversityChart.setOption({ series: [{ data: data.diversity }] })
+  if (climateChart) climateChart.setOption({ series: [{ data: [{ value: data.climate }] }] })
+  
+  // 更新底部环形图数据
+  footerData.value[0].value = data.footerValues[0]
+  footerData.value[0].display = data.footerValues[0].toFixed(1)
+  footerData.value[1].value = data.footerValues[1] * 2 // 满分假设50种，映射到0-100
+  footerData.value[1].display = data.footerValues[1].toString()
+  footerData.value[2].value = data.footerValues[2]
+  footerData.value[2].display = data.footerValues[2].toFixed(1)
+  footerData.value[3].value = data.footerValues[3] / 4 // 满分假设400万，映射到0-100
+  footerData.value[3].display = data.footerValues[3].toString()
+})
 
 // 图表实例
 let ecoChart: echarts.ECharts | null = null
@@ -16,52 +72,33 @@ let diversityChart: echarts.ECharts | null = null
 let growthChart: echarts.ECharts | null = null
 let climateChart: echarts.ECharts | null = null
 
-// 全屏功能
 const toggleFullscreen = () => {
   if (!isFullscreen.value) {
-    const elem = document.documentElement
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen()
-    } else if (elem.webkitRequestFullscreen) {
-      elem.webkitRequestFullscreen()
-    } else if (elem.msRequestFullscreen) {
-      elem.msRequestFullscreen()
-    }
+    document.documentElement.requestFullscreen()
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen()
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen()
-    }
+    document.exitFullscreen()
   }
 }
 
-// 监听全屏状态变化
 const handleFullscreenChange = () => {
-  isFullscreen.value = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement)
+  isFullscreen.value = !!document.fullscreenElement
 }
 
-// 自动全屏（如果是大屏设备）
-const checkAutoFullscreen = () => {
-  const screenWidth = window.screen.width
-  const screenHeight = window.screen.height
-  
-  // 大屏设备判断（例如 1920x1080 及以上）
-  if (screenWidth >= 1920 && screenHeight >= 1080) {
-    toggleFullscreen()
-  }
-}
-
-// 更新时间
 const updateTime = () => {
   currentTime.value = new Date().toLocaleString('zh-CN')
 }
 
-// 初始化图表
+// 自动缩放逻辑：基于 1920x1080 设计稿
+const updateScale = () => {
+  const designWidth = 1920
+  const designHeight = 1080
+  const windowWidth = window.innerWidth
+  const windowHeight = window.innerHeight
+  
+  scale.value = Math.min(windowWidth / designWidth, windowHeight / designHeight)
+}
+
 const initCharts = () => {
-  // 生态健康雷达图
   ecoChart = echarts.init(document.getElementById('ecoChart'))
   ecoChart.setOption({
     backgroundColor: 'transparent',
@@ -73,6 +110,7 @@ const initCharts = () => {
         { name: '水质指标', max: 100 },
         { name: '生态平衡', max: 100 }
       ],
+      name: { textStyle: { color: '#888', fontSize: 12 } },
       splitArea: { show: false },
       axisLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.3)' } },
       splitLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.1)' } }
@@ -81,120 +119,92 @@ const initCharts = () => {
       type: 'radar',
       data: [{
         value: [85, 92, 98, 90, 88],
-        name: '当前状态',
         areaStyle: { color: 'rgba(0, 255, 136, 0.2)' },
-        lineStyle: { color: 'rgba(0, 255, 136, 0.8)' },
+        lineStyle: { color: 'rgba(0, 255, 136, 0.8)', width: 2 },
         itemStyle: { color: '#00ff88' }
       }]
     }]
   })
 
-  // 生物多样性柱状图
   diversityChart = echarts.init(document.getElementById('diversityChart'))
   diversityChart.setOption({
-    grid: { top: 10, bottom: 20, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['鸟类', '昆虫', '植物', '微生物'], axisLabel: { color: '#aaa' } },
-    yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#222' } }, axisLabel: { color: '#aaa' } },
+    grid: { top: 20, bottom: 30, left: 40, right: 10 },
+    xAxis: { type: 'category', data: ['鸟类', '昆虫', '植物', '微生物'], axisLabel: { color: '#888' } },
+    yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#333' } }, axisLabel: { color: '#888' } },
     series: [{
       data: [15, 45, 120, 80],
       type: 'bar',
-      itemStyle: {
+      barWidth: '40%',
+      itemStyle: { 
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#00d4ff' },
-          { offset: 1, color: '#00ff88' }
-        ])
+          { offset: 0, color: '#00ff88' },
+          { offset: 1, color: '#00d4ff' }
+        ]),
+        borderRadius: [4, 4, 0, 0]
       }
     }]
   })
 
-  // 智慧生长图谱
   growthChart = echarts.init(document.getElementById('growthChart'))
   growthChart.setOption({
-    grid: { top: 20, bottom: 20, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['谷雨', '立夏', '小满', '芒种'], axisLabel: { color: '#aaa' } },
-    yAxis: { type: 'value', axisLabel: { color: '#aaa' } },
+    grid: { top: 20, bottom: 30, left: 40, right: 10 },
+    xAxis: { type: 'category', data: ['谷雨', '立夏', '小满', '芒种'], axisLabel: { color: '#888' } },
+    yAxis: { type: 'value', axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#333' } } },
     series: [{
       data: [45, 60, 85, 95],
       type: 'line',
       smooth: true,
-      areaStyle: { opacity: 0.1 },
-      lineStyle: { width: 3, color: '#ffcc33' },
-      itemStyle: { color: '#ffcc33' }
+      symbol: 'circle',
+      symbolSize: 6,
+      color: '#00ff88',
+      lineStyle: { 
+        color: '#00ff88', 
+        width: 2
+      },
+      itemStyle: { 
+        color: '#00ff88',
+        borderColor: '#00ff88',
+        borderWidth: 1
+      }
     }]
   })
 
-  // 微气候平衡度
   climateChart = echarts.init(document.getElementById('climateChart'))
   climateChart.setOption({
     series: [{
       type: 'gauge',
-      startAngle: 180,
-      endAngle: 0,
-      min: 0,
-      max: 100,
-      splitNumber: 5,
-      progress: { show: true, width: 8, itemStyle: { color: '#00d4ff' } },
-      axisLine: { lineStyle: { width: 8, color: [[1, '#111']] } },
+      radius: '90%',
+      progress: { show: true, width: 12, itemStyle: { color: '#00d4ff' } },
+      axisLine: { lineStyle: { width: 12, color: [[1, '#111']] } },
       axisTick: { show: false },
       splitLine: { show: false },
       axisLabel: { show: false },
-      anchor: { show: false },
-      title: { show: false },
-      detail: {
-        valueAnimation: true,
-        offsetCenter: [0, -10],
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#fff',
-        formatter: '{value}%'
-      },
+      detail: { fontSize: 24, color: '#fff', offsetCenter: [0, '30%'], formatter: '{value}%' },
       data: [{ value: 82.5 }]
     }]
   })
 }
 
-// 响应式调整
 const handleResize = () => {
+  updateScale()
   ecoChart?.resize()
   diversityChart?.resize()
   growthChart?.resize()
   climateChart?.resize()
 }
 
-// 文本测量优化（使用 Pretext）
-const optimizeTextLayout = async () => {
-  const hudLabels = document.querySelectorAll('.hud-label')
-  hudLabels.forEach(async (label) => {
-    const text = label.textContent || ''
-    const prepared = await prepare(text, FONT)
-    const { width } = layout(prepared, 1000, 20)
-    // 可以根据计算的宽度进行布局优化
-  })
-}
-
-onMounted(async () => {
+onMounted(() => {
   updateTime()
+  updateScale()
   setInterval(updateTime, 1000)
-  
   initCharts()
   window.addEventListener('resize', handleResize)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
-  document.addEventListener('webkitfullscreenchange', handleFullscreenChange)
-  document.addEventListener('MSFullscreenChange', handleFullscreenChange)
-  
-  // 检查是否需要自动全屏
-  checkAutoFullscreen()
-  
-  // 优化文本布局
-  await optimizeTextLayout()
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
-  document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
-  document.removeEventListener('MSFullscreenChange', handleFullscreenChange)
-  
   ecoChart?.dispose()
   diversityChart?.dispose()
   growthChart?.dispose()
@@ -203,442 +213,397 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-full h-screen bg-dark-bg-200 overflow-hidden">
-    <div class="container">
-      <header>
-        <div class="title-group">
-          <h1>时茗园 · 生态守护全景</h1>
+  <div class="dashboard-wrapper w-full h-full flex items-center justify-center overflow-hidden relative">
+    <!-- Background Gradients from backup -->
+    <div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[radial-gradient(circle_at_50%_50%,_rgba(0,212,255,0.15)_0%,_transparent_70%)]"></div>
+      <div class="absolute bottom-[-10%] left-[-10%] w-[80%] h-[80%] bg-[radial-gradient(circle_at_center,_rgba(0,255,136,0.1)_0%,_transparent_60%)]"></div>
+    </div>
+
+    <div 
+      ref="dashboardRef"
+      class="dashboard-content w-[1920px] h-[1080px] p-8 flex flex-col relative"
+      :style="{ transform: `scale(${scale})` }"
+    >
+      <!-- Header -->
+      <header class="flex justify-between items-start mb-10">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-4xl font-bold tracking-[4px] bg-gradient-to-r from-eco-green-400 to-smart-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,136,0.3)] font-['Orbitron']">
+            时茗园 · 生态守护全景
+          </h1>
         </div>
-        <div class="status-group">
-          <div class="flex items-center gap-1.5">
-            <Thermometer class="w-4 h-4" />
-            <span>温度: <span style="color: var(--eco-green)">22°C</span></span>
+        
+        <div class="flex items-center gap-6">
+          <!-- Role Switcher -->
+          <div class="flex bg-white/5 backdrop-blur-md rounded-full p-1 border border-white/10">
+            <button 
+              v-for="role in roles" 
+              :key="role.id"
+              @click="currentRole = role.id"
+              :class="[
+                'flex items-center gap-2 px-4 py-1.5 rounded-full transition-all text-xs font-bold tracking-wider',
+                currentRole === role.id ? 'bg-eco-green-500 text-black shadow-[0_0_15px_rgba(0,255,136,0.5)]' : 'text-gray-400 hover:text-white'
+              ]"
+            >
+              <component :is="role.icon" class="w-3 h-3" />
+              {{ role.name }}
+            </button>
           </div>
-          <div class="flex items-center gap-1.5">
-            <Droplets class="w-4 h-4" />
-            <span>湿度: <span style="color: var(--eco-green)">65%</span></span>
+
+          <div class="flex items-center gap-6 text-smart-blue-400 font-bold text-sm tracking-wider">
+            <div>温度: <span class="text-eco-green-400 ml-1">22°C</span></div>
+            <div>湿度: <span class="text-eco-green-400 ml-1">65%</span></div>
+            <div>天气: <span class="text-earth-gold-400 ml-1">晴转多云</span></div>
+            <div class="font-mono text-gray-400 ml-4 border-l border-white/20 pl-6">{{ currentTime }}</div>
+            <button @click="toggleFullscreen" class="p-1 hover:text-white transition-colors ml-2">
+              <Fullscreen v-if="!isFullscreen" class="w-5 h-5" />
+              <Minimize2 v-else class="w-5 h-5" />
+            </button>
           </div>
-          <div class="flex items-center gap-1.5">
-            <Cloud class="w-4 h-4" />
-            <span>天气: <span style="color: var(--earth-gold)">晴转多云</span></span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <Clock class="w-4 h-4" />
-            <span id="datetime">{{ currentTime }}</span>
-          </div>
-          <button 
-            @click="toggleFullscreen" 
-            class="p-2 rounded-full hover:bg-white/10 transition-colors"
-            :title="isFullscreen ? '退出全屏' : '进入全屏'"
-          >
-            <Fullscreen v-if="!isFullscreen" class="w-5 h-5" />
-            <Minimize2 v-else class="w-5 h-5" />
-          </button>
         </div>
       </header>
 
-      <!-- Left: Ecological Galaxy -->
-      <aside class="panel">
-        <div class="panel-title">
-          <div class="flex items-center gap-2">
-            <Shield class="w-5 h-5" />
-            生态健康指数
-          </div>
-          <span>实时评分: 94.5</span>
-        </div>
-        <img src="/biv2/a_high_fidelity_3d_holographic_model_of_a_lush_green_mountain_landscape_with.png" alt="Eco Mountain" class="panel-img">
-        <div id="ecoChart" class="chart-container"></div>
-        <div class="panel-title">
-          <div class="flex items-center gap-2">
-            <Flower2 class="w-5 h-5" />
-            生物多样性丰度
-          </div>
-        </div>
-        <div style="font-size: 0.85rem; color: #aaa;">
-          <p><span class="tag">声纹识别</span> 检测到珍稀鸟类: 3种</p>
-          <p style="margin-top: 5px;"><span class="tag">影像追踪</span> 活跃物种: 42种</p>
-        </div>
-        <div id="diversityChart" class="chart-container"></div>
-      </aside>
+      <div class="grid grid-cols-12 gap-8 flex-1 min-h-0">
+        <!-- Left Panel -->
+        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
+          <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
+            <div class="flex items-center justify-between mb-2 relative z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生态健康指数</span>
+              </div>
+              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
+                实时评分: 94.5
+              </div>
+            </div>
+            
+            <!-- Scanning Line Animation from backup style -->
+            <div class="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-eco-green-500/50 to-transparent top-0 animate-scan z-20 pointer-events-none"></div>
 
-      <!-- Center: Holographic Sand Table -->
-      <main class="center-stage">
-        <div class="hologram-container">
-          <!-- Floating HUD Indicators -->
-          <div class="hud-card top-left">
-            <span class="hud-label">Carbon Sequestration</span>
-            <span class="hud-value">124.5 t</span>
-          </div>
-          <div class="hud-card top-right">
-            <span class="hud-label">Water Cycle</span>
-            <span class="hud-value">98.2 %</span>
-          </div>
-          <div class="hud-card bottom-left">
-            <span class="hud-label">Zero Carbon Progress</span>
-            <span class="hud-value">85.0 %</span>
-          </div>
-          <div class="hud-card bottom-right">
-            <span class="hud-label">Community Value</span>
-            <span class="hud-value">320 万</span>
-          </div>
+            
+            <!-- Eco Radar Scanner Overlay -->
+            <div class="absolute inset-x-6 top-24 bottom-10 opacity-40 pointer-events-none scale-110">
+              <EcoScanner color="#00ff88" />
+            </div>
 
-          <img src="/biv2/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" alt="Tea Garden Digital Twin" class="hologram-img">
-          <div class="hologram-base"></div>
-        </div>
-      </main>
+            <div id="ecoChart" class="flex-1 min-h-0 relative z-10"></div>
+            
+            <!-- Decorative Corners -->
+            <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-white/10 rounded-tl-lg"></div>
+            <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/10 rounded-br-lg"></div>
+          </section>
 
-      <!-- Right: AI Wisdom Flow -->
-      <aside class="panel">
-        <div class="panel-title">
-          <div class="flex items-center gap-2">
-            <TrendingUp class="w-5 h-5" />
-            智慧生长图谱
-          </div>
-          <span>AI 决策建议</span>
-        </div>
-        <img src="/biv2/tea_garden_hologram.png" alt="Original Model" class="panel-img">
-        <div id="growthChart" class="chart-container"></div>
-        <div class="panel-title">
-          <div class="flex items-center gap-2">
-            <Sun class="w-5 h-5" />
-            微气候平衡度
-          </div>
-        </div>
-        <div id="climateChart" class="chart-container"></div>
-        <div class="panel-title">
-          <div class="flex items-center gap-2">
-            <AlertTriangle class="w-5 h-5" />
-            AI 预警中枢
-          </div>
-        </div>
-        <div style="background: rgba(255, 77, 79, 0.1); border: 1px solid rgba(255, 77, 79, 0.3); padding: 10px; border-radius: 8px; font-size: 0.85rem;">
-          <p style="color: #ff4d4f;">● 局部湿度异常 (提前量: 45min)</p>
-          <p style="color: #aaa; font-size: 0.75rem;">建议: 开启 3 号区自动化排灌系统</p>
-        </div>
-      </aside>
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
+            <div class="flex flex-col gap-2 mb-4 relative z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性丰度</span>
+              </div>
+              <div class="flex flex-col gap-1 mt-2 text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">声纹识别</span>
+                  <span class="text-gray-400">检测到珍稀鸟类: <span class="text-white">3种</span></span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">影像追踪</span>
+                  <span class="text-gray-400">活跃物种: <span class="text-white">42种</span></span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Eco Galaxy Particle Effect -->
+            <EcoGalaxy color="#00d4ff" />
 
-      <!-- Bottom Value Ring -->
-      <div class="footer-ring">
-        <div class="value-card">
-          <div class="value-icon">
-            <Shield class="w-6 h-6" />
+            <div id="diversityChart" class="flex-1 min-h-0 relative z-10"></div>
+          </section>
+        </aside>
+
+        <!-- Center Stage -->
+        <main class="col-span-6 relative perspective-lg preserve-3d">
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <!-- Central Hologram Graphic (Abstract) -->
+            <div class="relative w-[600px] h-[600px] flex items-center justify-center transform-gpu animate-float">
+               <!-- Carbon Sequestration Tree -->
+               <div class="absolute w-64 h-80 bottom-24 left-1/2 -translate-x-1/2 opacity-80" style="transform: translateZ(50px)">
+                  <CarbonTree :value="124.5" color="#00ff88" />
+               </div>
+               
+               <!-- Underground Network (Root) -->
+               <div class="absolute w-full h-40 bottom-0 left-0 opacity-40 blur-[1px]" style="transform: rotateX(70deg) translateZ(-50px)">
+                  <RootNetwork :health="92" color="#00d4ff" />
+               </div>
+
+               <!-- Floating HUD Points -->
+               <div class="absolute inset-0">
+                  <div class="absolute top-1/4 left-1/4 animate-pulse">
+                    <div class="w-2 h-2 bg-eco-green-400 rounded-full shadow-[0_0_10px_#00ff88]"></div>
+                  </div>
+                  <div class="absolute bottom-1/3 right-1/4 animate-pulse-slow">
+                    <div class="w-2 h-2 bg-smart-blue-400 rounded-full shadow-[0_0_10px_#00d4ff]"></div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- HUD Cards from backup with precise animations -->
+            <div 
+              class="hud-card top-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-eco-green-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
+              :class="{ 'scale-110 shadow-[0_0_60px_rgba(0,255,136,0.4)] border-white/40': currentRole === 'investor' || currentRole === 'researcher' }"
+            >
+
+              <div class="flex items-center gap-2 mb-2">
+                <Leaf class="w-4 h-4 text-eco-green-500" />
+                <PretextRenderer text="立体碳汇总量" :baseFont="FONT_LABEL" class="text-eco-green-500 opacity-70 tracking-widest" />
+              </div>
+              <PretextRenderer 
+                :segments="[{text: '124.5', font: FONT_VALUE, color: '#fff'}, {text: ' 吨/年', font: FONT_UNIT, color: '#00ff88'}]"
+              />
+
+            </div>
+
+            <div 
+              class="hud-card top-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-smart-blue-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
+              :class="{ 'scale-110 shadow-[0_0_60px_rgba(0,212,255,0.4)] border-white/40': currentRole === 'researcher' }"
+            >
+
+              <div class="flex items-center justify-end gap-2 mb-2">
+                <PretextRenderer text="光合能量效率" :baseFont="FONT_LABEL" class="text-smart-blue-400 opacity-70 tracking-widest" align="right" />
+                <Zap class="w-4 h-4 text-smart-blue-400" />
+              </div>
+              <PretextRenderer 
+                align="right"
+                :segments="[{text: '88.2', font: FONT_VALUE, color: '#fff'}, {text: ' %', font: FONT_UNIT, color: '#00d4ff'}]"
+              />
+            </div>
+
+            <div 
+              class="hud-card bottom-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-earth-gold-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
+              :class="{ 'scale-110 shadow-[0_0_60px_rgba(255,204,51,0.4)] border-white/40': currentRole === 'consumer' || currentRole === 'researcher' }"
+            >
+
+              <div class="flex items-center gap-2 mb-2">
+                <Activity class="w-4 h-4 text-earth-gold-500" />
+                <PretextRenderer text="水资源循环率" :baseFont="FONT_LABEL" class="text-earth-gold-500 opacity-70 tracking-widest" />
+              </div>
+              <PretextRenderer 
+                :segments="[{text: '98.2', font: FONT_VALUE, color: '#fff'}, {text: ' %', font: FONT_UNIT, color: '#ffcc33'}]"
+              />
+
+            </div>
+
+            <div 
+              class="hud-card bottom-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-purple-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
+              :class="{ 'scale-110 shadow-[0_0_60px_rgba(168,85,247,0.4)] border-white/40': currentRole === 'investor' }"
+            >
+
+              <div class="flex items-center justify-end gap-2 mb-2">
+                <PretextRenderer text="社区共生价值" :baseFont="FONT_LABEL" class="text-purple-400 opacity-70 tracking-widest" align="right" />
+                <Users class="w-4 h-4 text-purple-400" />
+              </div>
+              <PretextRenderer 
+                align="right"
+                :segments="[{text: '320', font: FONT_VALUE, color: '#fff'}, {text: ' 万元', font: FONT_UNIT, color: '#a855f7'}]"
+              />
+            </div>
+
+            <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
+            <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
+
+            <!-- Time-space Travel Slider -->
+            <div class="absolute bottom-4 w-[600px] z-30" style="transform: translateZ(100px)">
+               <TimelineSlider :options="timelineOptions" v-model="currentTimelineIndex" />
+            </div>
           </div>
-          <div class="value-info">
-            <h4>生态健康指数</h4>
-            <div class="number">94.5</div>
-          </div>
-        </div>
-        <div class="value-card">
-          <div class="value-icon">
-            <Flower2 class="w-6 h-6" />
-          </div>
-          <div class="value-info">
-            <h4>生物多样性</h4>
-            <div class="number">42 种</div>
-          </div>
-        </div>
-        <div class="value-card">
-          <div class="value-icon">
-            <Sun class="w-6 h-6" />
-          </div>
-          <div class="value-info">
-            <h4>微气候平衡</h4>
-            <div class="number">82.5%</div>
-          </div>
-        </div>
-        <div class="value-card">
-          <div class="value-icon">
-            <Users class="w-6 h-6" />
-          </div>
-          <div class="value-info">
-            <h4>社区价值</h4>
-            <div class="number">320 万</div>
-          </div>
-        </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
+            <div class="flex items-center justify-between mb-4 relative z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">智慧生长图谱</span>
+              </div>
+              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
+                AI 决策建议
+              </div>
+            </div>
+            
+            <!-- Tron Light Flow Overlay -->
+            <div class="absolute inset-x-6 top-20 bottom-6 opacity-40 pointer-events-none">
+              <LightFlow :intensity="80" color="#00ff88" />
+            </div>
+
+            <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
+            
+            <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <Cpu class="w-4 h-4 text-eco-green-500" />
+                <PretextRenderer text="AI 产量预测" baseFont="10px 'Noto Sans SC'" class="text-gray-500 uppercase tracking-tighter" />
+              </div>
+              <PretextRenderer text="Q3 预期产量: +12.4%" baseFont="bold 12px 'Noto Sans SC'" class="text-eco-green-500 font-mono" />
+            </div>
+
+          </section>
+
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20">
+            <div class="flex items-center gap-2 mb-6">
+              <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+              <span class="text-earth-gold-400 font-bold text-lg tracking-wider">微气候平衡度</span>
+            </div>
+            <div id="climateChart" class="flex-1 min-h-0"></div>
+          </section>
+
+          <section class="glass-panel rounded-3xl p-6 border-t border-white/20 relative">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+              <span class="text-earth-gold-400 font-bold text-lg tracking-wider">AI 预警中枢</span>
+            </div>
+            <div v-if="currentRole !== 'consumer'" class="flex flex-col gap-1 text-xs">
+              <div class="flex items-center gap-2 text-red-400">
+                <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                <span>局部湿度异常 (提前量: 45min)</span>
+              </div>
+              <div class="text-gray-400 pl-3.5 mt-1">
+                建议: 开启 3 号区自动化排灌系统
+              </div>
+            </div>
+            
+            <!-- Consumer View: AR Traceability Placeholder -->
+            <div v-else class="flex flex-col items-center gap-3">
+              <div class="w-24 h-24 bg-white p-2 rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <!-- Mock QR Code -->
+                <div class="w-full h-full border-2 border-black flex flex-wrap p-1">
+                  <div v-for="i in 16" :key="i" class="w-1/4 h-1/4" :class="Math.random() > 0.5 ? 'bg-black' : 'bg-transparent'"></div>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="text-eco-green-400 font-bold text-xs mb-1">扫码开启 AR 溯源</div>
+                <div class="text-[10px] text-gray-500">查看到期茶叶地块、采摘时间、加工工序</div>
+              </div>
+            </div>
+          </section>
+        </aside>
       </div>
+
+      <!-- Footer Values (Sustainable Value Ring) -->
+      <footer class="mt-10 grid grid-cols-4 gap-8">
+        <div v-for="(item, idx) in footerData" :key="idx" class="glass-panel rounded-2xl p-6 flex items-center gap-6 hover:border-white/40 transition-all cursor-pointer group shadow-xl" :class="item.glow">
+          
+          <!-- Animated Value Ring -->
+          <ValueRing :value="item.value" :color="item.valColor" :size="70" :strokeWidth="4" class="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
+            <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
+              <component :is="item.icon" class="w-6 h-6" :class="item.color" />
+            </div>
+          </ValueRing>
+
+          <div class="flex flex-col gap-1">
+            <PretextRenderer :text="item.title" baseFont="14px 'Noto Sans SC'" class="text-gray-500 font-medium tracking-wider" />
+            <PretextRenderer 
+              :segments="[
+                {text: item.display, font: 'bold 28px Orbitron', color: '#fff'},
+                {text: ' ' + item.unit, font: 'bold 12px Noto Sans SC', color: item.valColor}
+              ]" 
+            />
+          </div>
+        </div>
+      </footer>
     </div>
   </div>
 </template>
 
 <style scoped>
-:root {
-  --eco-green: #00ff88;
-  --tech-blue: #00d4ff;
-  --earth-gold: #ffcc33;
-  --bg-dark: #0a1118;
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+@keyframes scan {
+  from { top: 0; }
+  to { top: 100%; }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.animate-scan {
+  animation: scan 3s linear infinite;
 }
 
-body {
-  background-color: var(--bg-dark);
-  color: #fff;
-  font-family: 'Noto Sans SC', sans-serif;
-  overflow: hidden;
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 80%),
-    radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+.dashboard-wrapper {
+
+  background-color: #0a1118;
 }
 
-.container {
-  display: grid;
-  grid-template-columns: 400px 1fr 400px;
-  grid-template-rows: 100px 1fr 120px;
-  height: 100vh;
-  padding: 20px;
-  gap: 20px;
+.dashboard-content {
+  transform-origin: center center;
+  transition: transform 0.1s linear;
+  background: transparent;
+  z-index: 10;
 }
 
-/* Header */
-header {
-  grid-column: 1 / 4;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-  padding: 0 40px;
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.title-group h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.5rem;
-  letter-spacing: 4px;
-  background: linear-gradient(45deg, var(--eco-green), var(--tech-blue));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-}
-
-.status-group {
-  display: flex;
-  gap: 30px;
-  font-size: 0.9rem;
-  color: var(--tech-blue);
-  align-items: center;
-}
-
-/* Sidebar Panels */
-.panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  border-radius: 15px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  animation: fadeIn 1s ease-out;
-}
-
-.panel-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--earth-gold);
-  border-left: 4px solid var(--eco-green);
-  padding-left: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.panel-title span {
-  font-size: 0.8rem;
-  color: var(--tech-blue);
-  font-weight: normal;
-}
-
-/* Center Content */
-.center-stage {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.hologram-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1200px;
-  transform-style: preserve-3d;
-}
-
-.hologram-img {
-  max-width: 90%;
-  max-height: 90%;
-  filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
-  animation: float 6s ease-in-out infinite;
-}
-
-.panel-img {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid var(--glass-border);
-  margin: 10px 0;
-  filter: brightness(0.8) contrast(1.2);
-  transition: all 0.3s;
-}
-
-.panel-img:hover {
-  filter: brightness(1);
-  transform: scale(1.02);
-  border-color: var(--tech-blue);
-}
-
-.hologram-base {
-  position: absolute;
-  bottom: 10%;
-  width: 60%;
-  height: 20px;
-  background: radial-gradient(ellipse at center, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
-  transform: rotateX(60deg);
-}
-
-/* HUD Floating Indicators */
 .hud-card {
-  position: absolute;
-  background: rgba(0, 255, 136, 0.08);
-  border: 1px solid rgba(0, 255, 136, 0.4);
-  padding: 12px 18px;
-  border-radius: 4px;
-  backdrop-filter: blur(8px);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 160px;
-  pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   mix-blend-mode: screen;
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-  transition: all 0.5s ease;
+  pointer-events: auto;
 }
 
-/* 3D 空间定位与旋转 */
-.hud-card.top-left { 
-  top: 15%; left: 8%; 
-  transform: translateZ(50px) rotateY(20deg) rotateX(10deg);
-  animation: hudFloatLeft 5s infinite ease-in-out;
-}
-.hud-card.top-right { 
-  top: 15%; right: 8%; text-align: right; 
-  transform: translateZ(50px) rotateY(-20deg) rotateX(10deg);
-  animation: hudFloatRight 5s infinite ease-in-out;
-}
-.hud-card.bottom-left { 
-  bottom: 25%; left: 10%; 
-  transform: translateZ(80px) rotateY(15deg) rotateX(-5deg);
-  animation: hudFloatLeft 6s infinite ease-in-out -1s;
-}
-.hud-card.bottom-right { 
-  bottom: 25%; right: 10%; text-align: right; 
-  transform: translateZ(80px) rotateY(-15deg) rotateX(-5deg);
-  animation: hudFloatRight 6s infinite ease-in-out -1s;
+.hud-card:hover {
+  transform: translateZ(300px) scale(1.1) !important;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+  box-shadow: 0 0 50px rgba(0, 255, 136, 0.4);
 }
 
-.hud-card::before {
-  content: '';
-  position: absolute;
-  width: 40px;
-  height: 1px;
-  background: linear-gradient(to right, var(--eco-green), transparent);
-  opacity: 0.6;
+/* 3D Space Position & Rotation from backup */
+.hud-card.top-left {
+    top: 12%;
+    left: 2%;
+    transform: translateZ(100px) rotateY(20deg) rotateX(10deg);
+    animation: hudFloatLeft 5s infinite ease-in-out;
 }
 
-.hud-card.top-left::before { bottom: -25px; right: -30px; transform: rotate(45deg); }
-.hud-card.top-right::before { bottom: -25px; left: -30px; transform: rotate(-45deg); background: linear-gradient(to left, var(--eco-green), transparent); }
-.hud-card.bottom-left::before { top: -25px; right: -30px; transform: rotate(-45deg); }
-.hud-card.bottom-right::before { top: -25px; left: -30px; transform: rotate(45deg); background: linear-gradient(to left, var(--eco-green), transparent); }
-
-.hud-label {
-  font-size: 0.75rem;
-  color: var(--tech-blue);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-weight: bold;
+.hud-card.top-right {
+    top: 12%;
+    right: 2%;
+    text-align: right;
+    transform: translateZ(100px) rotateY(-20deg) rotateX(10deg);
+    animation: hudFloatRight 5s infinite ease-in-out;
 }
 
-.hud-value {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.4rem;
-  color: #fff;
-  text-shadow: 0 0 15px var(--eco-green);
+.hud-card.bottom-left {
+    bottom: 22%;
+    left: 0%;
+    transform: translateZ(150px) rotateY(15deg) rotateX(-5deg);
+    animation: hudFloatLeft 6s infinite ease-in-out -1s;
+}
+
+.hud-card.bottom-right {
+    bottom: 22%;
+    right: 0%;
+    text-align: right;
+    transform: translateZ(150px) rotateY(-15deg) rotateX(-5deg);
+    animation: hudFloatRight 6s infinite ease-in-out -1s;
 }
 
 @keyframes hudFloatLeft {
-  0%, 100% { transform: translateZ(50px) rotateY(20deg) rotateX(10deg) translateY(0); }
-  50% { transform: translateZ(80px) rotateY(22deg) rotateX(12deg) translateY(-10px); }
+    0%, 100% {
+        transform: translateZ(100px) rotateY(20deg) rotateX(10deg) translateY(0);
+    }
+    50% {
+        transform: translateZ(140px) rotateY(22deg) rotateX(12deg) translateY(-15px);
+    }
 }
 
 @keyframes hudFloatRight {
-  0%, 100% { transform: translateZ(50px) rotateY(-20deg) rotateX(10deg) translateY(0); }
-  50% { transform: translateZ(80px) rotateY(-22deg) rotateX(12deg) translateY(-10px); }
+    0%, 100% {
+        transform: translateZ(100px) rotateY(-20deg) rotateX(10deg) translateY(0);
+    }
+    50% {
+        transform: translateZ(140px) rotateY(-22deg) rotateX(12deg) translateY(-15px);
+    }
 }
 
-/* Bottom Value Ring */
-.footer-ring {
-  grid-column: 1 / 4;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+.glass-panel {
+  background: rgba(15, 23, 42, 0.3);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.value-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(5px);
-  border-radius: 10px;
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  border-bottom: 2px solid transparent;
-  transition: all 0.3s;
-}
-
-.value-card:hover {
-  border-bottom-color: var(--eco-green);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.value-icon {
-  width: 50px;
-  height: 50px;
-  background: rgba(0, 255, 136, 0.1);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  color: var(--eco-green);
-}
-
-.value-info h4 {
-  font-size: 0.9rem;
-  color: #ccc;
-}
-
-.value-info .number {
-  font-size: 1.5rem;
-  font-weight: 700;
-  font-family: 'Orbitron', sans-serif;
-  color: #fff;
-}
-
-/* Charts */
-.chart-container {
-  flex: 1;
-  min-height: 200px;
+@keyframes pulse {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.1); }
 }
 
 @keyframes float {
@@ -646,57 +611,7 @@ header {
   50% { transform: translateY(-20px); }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* Responsive Tags */
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  background: rgba(0, 212, 255, 0.2);
-  color: var(--tech-blue);
-  margin-right: 5px;
-}
-
-/* 大屏优化 */
-@media screen and (min-width: 1920px) {
-  .container {
-    grid-template-columns: 500px 1fr 500px;
-    padding: 30px;
-    gap: 30px;
-  }
-  
-  .title-group h1 {
-    font-size: 3rem;
-  }
-  
-  .panel {
-    padding: 25px;
-  }
-  
-  .panel-title {
-    font-size: 1.4rem;
-  }
-  
-  .hud-card {
-    min-width: 200px;
-    padding: 15px 20px;
-  }
-  
-  .hud-value {
-    font-size: 1.8rem;
-  }
-  
-  .value-card {
-    padding: 20px;
-  }
-  
-  .value-info .number {
-    font-size: 1.8rem;
-  }
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 </style>
