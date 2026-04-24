@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Fullscreen, Minimize2, Shield, Flower2, Sun, Users, Activity, Cpu, Leaf, Zap } from 'lucide-vue-next'
+import { Fullscreen, Minimize2, Cpu, Leaf, Zap, Activity, Users } from 'lucide-vue-next'
 import * as echarts from 'echarts'
 import CarbonTree from './visuals/CarbonTree.vue'
 import RootNetwork from './visuals/RootNetwork.vue'
 import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
-import ValueRing from './visuals/ValueRing.vue'
 import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
@@ -17,20 +16,6 @@ const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
 const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
 const currentTimelineIndex = ref(0)
-const currentRole = ref<'researcher' | 'investor' | 'consumer'>('researcher')
-const roles = [
-  { id: 'researcher', name: '研究者', icon: Cpu, desc: '专注生态技术指标' },
-  { id: 'investor', name: '投资者', icon: Zap, desc: '关注资产与社会价值' },
-  { id: 'consumer', name: '消费者', icon: Leaf, desc: '追溯品质与健康指数' }
-] as const
-
-// 底部卡片响应式数据
-const footerData = ref([
-  {icon: Shield, title: '生态健康指数', value: 94.5, display: '94.5', unit: '分', color: 'text-eco-green-400', glow: 'shadow-eco-green-500/10', valColor: '#00ff88'},
-  {icon: Flower2, title: '生物多样性丰度', value: 84, display: '42', unit: '种', color: 'text-earth-gold-400', glow: 'shadow-earth-gold-500/10', valColor: '#ffcc33'},
-  {icon: Sun, title: '微气候平衡度', value: 82.5, display: '82.5', unit: '%', color: 'text-smart-blue-400', glow: 'shadow-smart-blue-500/10', valColor: '#00d4ff'},
-  {icon: Users, title: '社会价值贡献', value: 80, display: '320', unit: '万', color: 'text-purple-400', glow: 'shadow-purple-500/10', valColor: '#a855f7'}
-])
 
 // 模拟不同节气的数据
 const seasonalData = [
@@ -49,16 +34,6 @@ watch(currentTimelineIndex, (newIdx) => {
   if (ecoChart) ecoChart.setOption({ series: [{ data: [{ value: data.ecoRadar }] }] })
   if (diversityChart) diversityChart.setOption({ series: [{ data: data.diversity }] })
   if (climateChart) climateChart.setOption({ series: [{ data: [{ value: data.climate }] }] })
-  
-  // 更新底部环形图数据
-  footerData.value[0].value = data.footerValues[0]
-  footerData.value[0].display = data.footerValues[0].toFixed(1)
-  footerData.value[1].value = data.footerValues[1] * 2 // 满分假设50种，映射到0-100
-  footerData.value[1].display = data.footerValues[1].toString()
-  footerData.value[2].value = data.footerValues[2]
-  footerData.value[2].display = data.footerValues[2].toFixed(1)
-  footerData.value[3].value = data.footerValues[3] / 4 // 满分假设400万，映射到0-100
-  footerData.value[3].display = data.footerValues[3].toString()
 })
 
 // 图表实例
@@ -228,33 +203,15 @@ onUnmounted(() => {
           </h1>
         </div>
         
-        <div class="flex items-center gap-6">
-          <!-- Role Switcher -->
-          <div class="flex bg-white/5 backdrop-blur-md rounded-full p-1 border border-white/10">
-            <button 
-              v-for="role in roles" 
-              :key="role.id"
-              @click="currentRole = role.id"
-              :class="[
-                'flex items-center gap-2 px-4 py-1.5 rounded-full transition-all text-xs font-bold tracking-wider',
-                currentRole === role.id ? 'bg-eco-green-500 text-black shadow-[0_0_15px_rgba(0,255,136,0.5)]' : 'text-gray-400 hover:text-white'
-              ]"
-            >
-              <component :is="role.icon" class="w-3 h-3" />
-              {{ role.name }}
-            </button>
-          </div>
-
-          <div class="flex items-center gap-6 text-smart-blue-400 font-bold text-sm tracking-wider">
-            <div>温度: <span class="text-eco-green-400 ml-1">22°C</span></div>
-            <div>湿度: <span class="text-eco-green-400 ml-1">65%</span></div>
-            <div>天气: <span class="text-earth-gold-400 ml-1">晴转多云</span></div>
-            <div class="font-mono text-gray-400 ml-4 border-l border-white/20 pl-6">{{ currentTime }}</div>
-            <button @click="toggleFullscreen" class="p-1 hover:text-white transition-colors ml-2">
-              <Fullscreen v-if="!isFullscreen" class="w-5 h-5" />
-              <Minimize2 v-else class="w-5 h-5" />
-            </button>
-          </div>
+        <div class="flex items-center gap-6 text-smart-blue-400 font-bold text-sm tracking-wider">
+          <div>温度: <span class="text-eco-green-400 ml-1">22°C</span></div>
+          <div>湿度: <span class="text-eco-green-400 ml-1">65%</span></div>
+          <div>天气: <span class="text-earth-gold-400 ml-1">晴转多云</span></div>
+          <div class="font-mono text-gray-400 ml-4 border-l border-white/20 pl-6">{{ currentTime }}</div>
+          <button @click="toggleFullscreen" class="p-1 hover:text-white transition-colors ml-2">
+            <Fullscreen v-if="!isFullscreen" class="w-5 h-5" />
+            <Minimize2 v-else class="w-5 h-5" />
+          </button>
         </div>
       </header>
 
@@ -342,7 +299,6 @@ onUnmounted(() => {
             <!-- HUD Cards from backup with precise animations -->
             <div 
               class="hud-card top-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-eco-green-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-              :class="{ 'scale-110 shadow-[0_0_60px_rgba(0,255,136,0.4)] border-white/40': currentRole === 'investor' || currentRole === 'researcher' }"
             >
 
               <div class="flex items-center gap-2 mb-2">
@@ -358,7 +314,6 @@ onUnmounted(() => {
 
             <div 
               class="hud-card top-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-smart-blue-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-              :class="{ 'scale-110 shadow-[0_0_60px_rgba(0,212,255,0.4)] border-white/40': currentRole === 'researcher' }"
             >
 
               <div class="flex items-center justify-end gap-2 mb-2">
@@ -373,7 +328,6 @@ onUnmounted(() => {
 
             <div 
               class="hud-card bottom-left glass-panel p-6 rounded-2xl absolute border-l-4 border-l-earth-gold-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-              :class="{ 'scale-110 shadow-[0_0_60px_rgba(255,204,51,0.4)] border-white/40': currentRole === 'consumer' || currentRole === 'researcher' }"
             >
 
               <div class="flex items-center gap-2 mb-2">
@@ -389,7 +343,6 @@ onUnmounted(() => {
 
             <div 
               class="hud-card bottom-right glass-panel p-6 rounded-2xl absolute border-r-4 border-r-purple-500 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-20 transition-all duration-700"
-              :class="{ 'scale-110 shadow-[0_0_60px_rgba(168,85,247,0.4)] border-white/40': currentRole === 'investor' }"
             >
 
               <div class="flex items-center justify-end gap-2 mb-2">
@@ -455,7 +408,7 @@ onUnmounted(() => {
               <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
               <span class="text-earth-gold-400 font-bold text-lg tracking-wider">AI 预警中枢</span>
             </div>
-            <div v-if="currentRole !== 'consumer'" class="flex flex-col gap-1 text-xs">
+            <div class="flex flex-col gap-1 text-xs">
               <div class="flex items-center gap-2 text-red-400">
                 <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
                 <span>局部湿度异常 (提前量: 45min)</span>
@@ -464,44 +417,11 @@ onUnmounted(() => {
                 建议: 开启 3 号区自动化排灌系统
               </div>
             </div>
-            
-            <!-- Consumer View: AR Traceability Placeholder -->
-            <div v-else class="flex flex-col items-center gap-3">
-              <div class="w-24 h-24 bg-white p-2 rounded-lg shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                <!-- Mock QR Code -->
-                <div class="w-full h-full border-2 border-black flex flex-wrap p-1">
-                  <div v-for="i in 16" :key="i" class="w-1/4 h-1/4" :class="Math.random() > 0.5 ? 'bg-black' : 'bg-transparent'"></div>
-                </div>
-              </div>
-              <div class="text-center">
-                <div class="text-eco-green-400 font-bold text-xs mb-1">扫码开启 AR 溯源</div>
-                <div class="text-[10px] text-gray-500">查看到期茶叶地块、采摘时间、加工工序</div>
-              </div>
-            </div>
           </section>
         </aside>
       </div>
 
-      <!-- Footer Values (Sustainable Value Ring) -->
-    <footer class="mt-10 grid grid-cols-4 gap-8">
-      <div v-for="(item, idx) in footerData" :key="idx" class="glass-panel rounded-2xl p-6 flex items-center gap-6 hover:border-white/40 transition-all cursor-pointer group shadow-xl" :class="item.glow">
-        
-        <!-- Animated Value Ring -->
-        <ValueRing :value="item.value" :color="item.valColor" :size="70" :strokeWidth="4" class="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
-          <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
-            <component :is="item.icon" class="w-6 h-6" :class="item.color" />
-          </div>
-        </ValueRing>
 
-        <div class="flex flex-col gap-1">
-          <span class="text-gray-500 font-medium tracking-wider text-base">{{ item.title }}</span>
-          <div>
-            <span class="font-['Orbitron'] font-bold text-3xl text-white">{{ item.display }}</span>
-            <span class="font-['Noto_Sans_SC'] font-bold text-sm" :style="{ color: item.valColor }"> {{ item.unit }}</span>
-          </div>
-        </div>
-      </div>
-    </footer>
     </div>
   </div>
 </template>
