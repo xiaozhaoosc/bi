@@ -116,10 +116,10 @@ const initCharts = () => {
   growthChart = echarts.init(document.getElementById('growthChart'))
   growthChart.setOption({
     grid: { top: 20, bottom: 30, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['谷雨', '立夏', '小满', '芒种'], axisLabel: { color: '#888' } },
+    xAxis: { type: 'category', data: ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满'], axisLabel: { color: '#888' } },
     yAxis: { type: 'value', axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#333' } } },
     series: [{
-      data: [45, 60, 85, 95],
+      data: [25, 32, 40, 55, 65, 80, 90, 95],
       type: 'line',
       smooth: true,
       symbol: 'circle',
@@ -133,6 +133,12 @@ const initCharts = () => {
         color: '#00ff88',
         borderColor: '#00ff88',
         borderWidth: 1
+      },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: 'rgba(0, 255, 136, 0.3)' },
+          { offset: 1, color: 'rgba(0, 255, 136, 0.05)' }
+        ])
       }
     }]
   })
