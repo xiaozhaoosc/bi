@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Fullscreen, Minimize2, Thermometer, Droplets, Cloud, Clock, Shield, Flower2, Sun, Users, Activity, Cpu, AlertTriangle, Leaf, Zap } from 'lucide-vue-next'
+import { Fullscreen, Minimize2, Shield, Flower2, Sun, Users, Activity, Cpu, Leaf, Zap } from 'lucide-vue-next'
 import * as echarts from 'echarts'
-import PretextRenderer from './PretextRenderer.vue'
 import CarbonTree from './visuals/CarbonTree.vue'
 import RootNetwork from './visuals/RootNetwork.vue'
 import LightFlow from './visuals/LightFlow.vue'
@@ -11,17 +10,13 @@ import ValueRing from './visuals/ValueRing.vue'
 import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
-const FONT_TITLE = 'bold 32px "Noto Sans SC", sans-serif'
-const FONT_LABEL = '12px "Noto Sans SC", sans-serif'
-const FONT_VALUE = 'bold 24px "Orbitron", sans-serif'
-const FONT_UNIT = '14px "Noto Sans SC", sans-serif'
-
 // 状态管理
 const isFullscreen = ref(false)
 const currentTime = ref('')
 const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
 const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
+const currentTimelineIndex = ref(0)
 const currentRole = ref<'researcher' | 'investor' | 'consumer'>('researcher')
 const roles = [
   { id: 'researcher', name: '研究者', icon: Cpu, desc: '专注生态技术指标' },
@@ -352,11 +347,12 @@ onUnmounted(() => {
 
               <div class="flex items-center gap-2 mb-2">
                 <Leaf class="w-4 h-4 text-eco-green-500" />
-                <PretextRenderer text="立体碳汇总量" :baseFont="FONT_LABEL" class="text-eco-green-500 opacity-70 tracking-widest" />
+                <span class="text-eco-green-500 opacity-70 tracking-widest text-sm">立体碳汇总量</span>
               </div>
-              <PretextRenderer 
-                :segments="[{text: '124.5', font: FONT_VALUE, color: '#fff'}, {text: ' 吨/年', font: FONT_UNIT, color: '#00ff88'}]"
-              />
+              <div>
+                <span class="font-['Orbitron'] font-bold text-2xl text-white">124.5</span>
+                <span class="text-['Noto_Sans_SC'] text-base text-eco-green-500"> 吨/年</span>
+              </div>
 
             </div>
 
@@ -366,13 +362,13 @@ onUnmounted(() => {
             >
 
               <div class="flex items-center justify-end gap-2 mb-2">
-                <PretextRenderer text="光合能量效率" :baseFont="FONT_LABEL" class="text-smart-blue-400 opacity-70 tracking-widest" align="right" />
+                <span class="text-smart-blue-400 opacity-70 tracking-widest text-sm">光合能量效率</span>
                 <Zap class="w-4 h-4 text-smart-blue-400" />
               </div>
-              <PretextRenderer 
-                align="right"
-                :segments="[{text: '88.2', font: FONT_VALUE, color: '#fff'}, {text: ' %', font: FONT_UNIT, color: '#00d4ff'}]"
-              />
+              <div class="text-right">
+                <span class="font-['Orbitron'] font-bold text-2xl text-white">88.2</span>
+                <span class="text-['Noto_Sans_SC'] text-base text-smart-blue-400"> %</span>
+              </div>
             </div>
 
             <div 
@@ -382,11 +378,12 @@ onUnmounted(() => {
 
               <div class="flex items-center gap-2 mb-2">
                 <Activity class="w-4 h-4 text-earth-gold-500" />
-                <PretextRenderer text="水资源循环率" :baseFont="FONT_LABEL" class="text-earth-gold-500 opacity-70 tracking-widest" />
+                <span class="text-earth-gold-500 opacity-70 tracking-widest text-sm">水资源循环率</span>
               </div>
-              <PretextRenderer 
-                :segments="[{text: '98.2', font: FONT_VALUE, color: '#fff'}, {text: ' %', font: FONT_UNIT, color: '#ffcc33'}]"
-              />
+              <div>
+                <span class="font-['Orbitron'] font-bold text-2xl text-white">98.2</span>
+                <span class="text-['Noto_Sans_SC'] text-base text-earth-gold-500"> %</span>
+              </div>
 
             </div>
 
@@ -396,13 +393,13 @@ onUnmounted(() => {
             >
 
               <div class="flex items-center justify-end gap-2 mb-2">
-                <PretextRenderer text="社区共生价值" :baseFont="FONT_LABEL" class="text-purple-400 opacity-70 tracking-widest" align="right" />
+                <span class="text-purple-400 opacity-70 tracking-widest text-sm">社区共生价值</span>
                 <Users class="w-4 h-4 text-purple-400" />
               </div>
-              <PretextRenderer 
-                align="right"
-                :segments="[{text: '320', font: FONT_VALUE, color: '#fff'}, {text: ' 万元', font: FONT_UNIT, color: '#a855f7'}]"
-              />
+              <div class="text-right">
+                <span class="font-['Orbitron'] font-bold text-2xl text-white">320</span>
+                <span class="text-['Noto_Sans_SC'] text-base text-purple-400"> 万元</span>
+              </div>
             </div>
 
             <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
@@ -438,9 +435,9 @@ onUnmounted(() => {
             <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <Cpu class="w-4 h-4 text-eco-green-500" />
-                <PretextRenderer text="AI 产量预测" baseFont="10px 'Noto Sans SC'" class="text-gray-500 uppercase tracking-tighter" />
+                <span class="text-gray-500 uppercase tracking-tighter text-xs">AI 产量预测</span>
               </div>
-              <PretextRenderer text="Q3 预期产量: +12.4%" baseFont="bold 12px 'Noto Sans SC'" class="text-eco-green-500 font-mono" />
+              <span class="text-eco-green-500 font-mono text-sm font-bold">Q3 预期产量: +12.4%</span>
             </div>
 
           </section>
@@ -486,27 +483,25 @@ onUnmounted(() => {
       </div>
 
       <!-- Footer Values (Sustainable Value Ring) -->
-      <footer class="mt-10 grid grid-cols-4 gap-8">
-        <div v-for="(item, idx) in footerData" :key="idx" class="glass-panel rounded-2xl p-6 flex items-center gap-6 hover:border-white/40 transition-all cursor-pointer group shadow-xl" :class="item.glow">
-          
-          <!-- Animated Value Ring -->
-          <ValueRing :value="item.value" :color="item.valColor" :size="70" :strokeWidth="4" class="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
-            <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
-              <component :is="item.icon" class="w-6 h-6" :class="item.color" />
-            </div>
-          </ValueRing>
+    <footer class="mt-10 grid grid-cols-4 gap-8">
+      <div v-for="(item, idx) in footerData" :key="idx" class="glass-panel rounded-2xl p-6 flex items-center gap-6 hover:border-white/40 transition-all cursor-pointer group shadow-xl" :class="item.glow">
+        
+        <!-- Animated Value Ring -->
+        <ValueRing :value="item.value" :color="item.valColor" :size="70" :strokeWidth="4" class="group-hover:scale-110 group-hover:rotate-12 transition-transform duration-500">
+          <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center backdrop-blur-md">
+            <component :is="item.icon" class="w-6 h-6" :class="item.color" />
+          </div>
+        </ValueRing>
 
-          <div class="flex flex-col gap-1">
-            <PretextRenderer :text="item.title" baseFont="14px 'Noto Sans SC'" class="text-gray-500 font-medium tracking-wider" />
-            <PretextRenderer 
-              :segments="[
-                {text: item.display, font: 'bold 28px Orbitron', color: '#fff'},
-                {text: ' ' + item.unit, font: 'bold 12px Noto Sans SC', color: item.valColor}
-              ]" 
-            />
+        <div class="flex flex-col gap-1">
+          <span class="text-gray-500 font-medium tracking-wider text-base">{{ item.title }}</span>
+          <div>
+            <span class="font-['Orbitron'] font-bold text-3xl text-white">{{ item.display }}</span>
+            <span class="font-['Noto_Sans_SC'] font-bold text-sm" :style="{ color: item.valColor }"> {{ item.unit }}</span>
           </div>
         </div>
-      </footer>
+      </div>
+    </footer>
     </div>
   </div>
 </template>

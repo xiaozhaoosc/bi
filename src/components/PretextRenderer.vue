@@ -56,16 +56,16 @@ onMounted(() => {
       'justify-end': align === 'right'
     }">
       <span 
-        v-for="(glyph, gIdx) in (line as any).glyphs || []" 
+        v-for="(glyph, gIdx) in (line as any)?.glyphs || []" 
         :key="gIdx" 
         class="pretext-glyph inline-block"
         :style="{
-          width: glyph.width + 'px',
-          font: glyph.font,
-          color: (glyph as any).segmentIndex !== undefined ? (segments?.[(glyph as any).segmentIndex]?.color || 'inherit') : 'inherit'
+          width: glyph?.width + 'px',
+          font: glyph?.font,
+          color: (glyph as any)?.segmentIndex !== undefined && (segments?.[(glyph as any).segmentIndex]) ? (segments[(glyph as any).segmentIndex].color || 'inherit') : 'inherit'
         }"
       >
-        {{ glyph.char }}
+        {{ glyph?.char || '' }}
       </span>
     </div>
   </div>
