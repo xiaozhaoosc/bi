@@ -35,7 +35,7 @@
         .container {
             display: grid;
             grid-template-columns: 400px 1fr 400px;
-            grid-template-rows: 100px 1fr 200px;
+            grid-template-rows: 100px 1fr;
             height: 100vh;
             padding: 20px;
             gap: 20px;
@@ -115,6 +115,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            perspective: 1200px;
+            transform-style: preserve-3d;
         }
 
         .hologram-img {
@@ -124,13 +126,109 @@
             animation: float 6s ease-in-out infinite;
         }
 
+        .panel-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            margin: 10px 0;
+            filter: brightness(0.8) contrast(1.2);
+            transition: all 0.3s;
+        }
+
+        .panel-img:hover {
+            filter: brightness(1);
+            transform: scale(1.02);
+            border-color: var(--tech-blue);
+        }
+
         .hologram-base {
             position: absolute;
             bottom: 10%;
             width: 60%;
             height: 20px;
-            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
             transform: rotateX(60deg);
+        }
+
+        /* HUD Floating Indicators */
+        .hud-card {
+            position: absolute;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.4);
+            padding: 12px 18px;
+            border-radius: 4px;
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 160px;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        /* 3D 空间定位与旋转 */
+        .hud-card.top-left { 
+            top: 15%; left: 8%; 
+            transform: translateZ(50px) rotateY(20deg) rotateX(10deg);
+            animation: hudFloatLeft 5s infinite ease-in-out;
+        }
+        .hud-card.top-right { 
+            top: 15%; right: 8%; text-align: right; 
+            transform: translateZ(50px) rotateY(-20deg) rotateX(10deg);
+            animation: hudFloatRight 5s infinite ease-in-out;
+        }
+        .hud-card.bottom-left { 
+            bottom: 25%; left: 10%; 
+            transform: translateZ(80px) rotateY(15deg) rotateX(-5deg);
+            animation: hudFloatLeft 6s infinite ease-in-out -1s;
+        }
+        .hud-card.bottom-right { 
+            bottom: 25%; right: 10%; text-align: right; 
+            transform: translateZ(80px) rotateY(-15deg) rotateX(-5deg);
+            animation: hudFloatRight 6s infinite ease-in-out -1s;
+        }
+
+        .hud-card::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 1px;
+            background: linear-gradient(to right, var(--eco-green), transparent);
+            opacity: 0.6;
+        }
+
+        .hud-card.top-left::before { bottom: -25px; right: -30px; transform: rotate(45deg); }
+        .hud-card.top-right::before { bottom: -25px; left: -30px; transform: rotate(-45deg); background: linear-gradient(to left, var(--eco-green), transparent); }
+        .hud-card.bottom-left::before { top: -25px; right: -30px; transform: rotate(-45deg); }
+        .hud-card.bottom-right::before { top: -25px; left: -30px; transform: rotate(45deg); background: linear-gradient(to left, var(--eco-green), transparent); }
+
+        .hud-label {
+            font-size: 0.75rem;
+            color: var(--tech-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .hud-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            text-shadow: 0 0 15px var(--eco-green);
+        }
+
+        @keyframes hudFloatLeft {
+            0%, 100% { transform: translateZ(50px) rotateY(20deg) rotateX(10deg) translateY(0); }
+            50% { transform: translateZ(80px) rotateY(22deg) rotateX(12deg) translateY(-10px); }
+        }
+
+        @keyframes hudFloatRight {
+            0%, 100% { transform: translateZ(50px) rotateY(-20deg) rotateX(10deg) translateY(0); }
+            50% { transform: translateZ(80px) rotateY(-22deg) rotateX(12deg) translateY(-10px); }
         }
 
         /* Bottom Value Ring */
@@ -231,6 +329,7 @@
                 生态健康指数
                 <span>实时评分: 94.5</span>
             </div>
+            <img src="a_high_fidelity_3d_holographic_model_of_a_lush_green_mountain_landscape_with.png" alt="Eco Mountain" class="panel-img">
             <div id="ecoChart" class="chart-container"></div>
             <div class="panel-title">
                 生物多样性丰度
@@ -245,7 +344,25 @@
         <!-- Center: Holographic Sand Table -->
         <main class="center-stage">
             <div class="hologram-container">
-                <img src="tea_garden_hologram.png" alt="Tea Garden Hologram" class="hologram-img">
+                <!-- Floating HUD Indicators -->
+                <div class="hud-card top-left">
+                    <span class="hud-label">Carbon Sequestration</span>
+                    <span class="hud-value">124.5 t</span>
+                </div>
+                <div class="hud-card top-right">
+                    <span class="hud-label">Water Cycle</span>
+                    <span class="hud-value">98.2 %</span>
+                </div>
+                <div class="hud-card bottom-left">
+                    <span class="hud-label">Zero Carbon Progress</span>
+                    <span class="hud-value">85.0 %</span>
+                </div>
+                <div class="hud-card bottom-right">
+                    <span class="hud-label">Community Value</span>
+                    <span class="hud-value">320 万</span>
+                </div>
+
+                <img src="a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" alt="Tea Garden Digital Twin" class="hologram-img">
                 <div class="hologram-base"></div>
             </div>
         </main>
@@ -256,6 +373,7 @@
                 智慧生长图谱
                 <span>AI 决策建议</span>
             </div>
+            <img src="tea_garden_hologram.png" alt="Original Model" class="panel-img">
             <div id="growthChart" class="chart-container"></div>
             <div class="panel-title">
                 微气候平衡度
@@ -270,37 +388,7 @@
             </div>
         </aside>
 
-        <!-- Bottom: Value Ring -->
-        <footer class="footer-ring">
-            <div class="value-card">
-                <div class="value-icon">🌱</div>
-                <div class="value-info">
-                    <h4>年固碳量</h4>
-                    <div class="number">124.5 t</div>
-                </div>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">💧</div>
-                <div class="value-info">
-                    <h4>水资源循环率</h4>
-                    <div class="number">98.2 %</div>
-                </div>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">⚡</div>
-                <div class="value-info">
-                    <h4>零碳足迹进度</h4>
-                    <div class="number">85.0 %</div>
-                </div>
-            </div>
-            <div class="value-card">
-                <div class="value-icon">🤝</div>
-                <div class="value-info">
-                    <h4>社区共生价值</h4>
-                    <div class="number">320 万</div>
-                </div>
-            </div>
-        </footer>
+
     </div>
 
     <script>
