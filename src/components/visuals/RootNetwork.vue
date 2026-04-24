@@ -27,10 +27,10 @@ const initNodes = (w: number, h: number) => {
   // Root origin
   nodes.push({ x: w / 2, y: 0, baseX: w / 2, targetY: 0, children: [], layer: 0 })
 
-  let currentLayerNodes = [0]
+  let currentLayerNodes: number[] = [0]
 
   for (let l = 1; l < layers; l++) {
-    const nextLayerNodes = []
+    const nextLayerNodes: number[] = []
     const ySpacing = h / (layers - 1)
 
     currentLayerNodes.forEach(parentId => {

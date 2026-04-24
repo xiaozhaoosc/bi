@@ -7,8 +7,6 @@ let chartInstance: echarts.ECharts | null = null
 let updateInterval: ReturnType<typeof setInterval> | null = null
 
 const balance = ref(85)
-const temperature = ref(24.5)
-const humidity = ref(68)
 const light = ref(72)
 const co2 = ref(450)
 
@@ -32,8 +30,6 @@ const initChart = () => {
       formatter: (params: any) => {
         const name = params.seriesName as string
         const indicators: Record<string, { name: string; value: number; unit: string; color: string }> = {
-          temperature: { name: '温度', value: temperature.value, unit: '°C', color: '#ef4444' },
-          humidity: { name: '湿度', value: humidity.value, unit: '%', color: '#3b82f6' },
           light: { name: '光照', value: light.value, unit: '%', color: '#eab308' },
           co2: { name: 'CO₂', value: co2.value, unit: 'ppm', color: '#22c55e' }
         }
@@ -56,9 +52,7 @@ const initChart = () => {
           lineStyle: {
             width: 12,
             color: [
-              [0.25, 'rgba(239, 68, 68, 0.3)'],
-              [0.5, 'rgba(59, 130, 246, 0.3)'],
-              [0.75, 'rgba(234, 179, 8, 0.3)'],
+              [0.5, 'rgba(234, 179, 8, 0.3)'],
               [1, 'rgba(34, 197, 94, 0.3)']
             ]
           }
@@ -79,9 +73,7 @@ const initChart = () => {
               x2: 1,
               y2: 1,
               colorStops: [
-                { offset: 0, color: '#ef4444' },
-                { offset: 0.33, color: '#3b82f6' },
-                { offset: 0.66, color: '#eab308' },
+                { offset: 0, color: '#eab308' },
                 { offset: 1, color: '#22c55e' }
               ]
             }
@@ -97,78 +89,7 @@ const initChart = () => {
           show: false
         }
       },
-      {
-        name: 'temperature',
-        type: 'gauge',
-        radius: '75%',
-        center: ['50%', '50%'],
-        min: 15,
-        max: 35,
-        startAngle: 180,
-        endAngle: 90,
-        splitNumber: 5,
-        axisLine: {
-          lineStyle: {
-            width: 6,
-            color: [[1, 'rgba(239, 68, 68, 0.4)']]
-          }
-        },
-        pointer: {
-          itemStyle: { color: '#ef4444' },
-          length: '55%',
-          width: 2.5
-        },
-        axisTick: { show: false },
-        splitLine: {
-          distance: -8,
-          length: 6,
-          lineStyle: { color: '#ef4444', width: 1.5 }
-        },
-        axisLabel: {
-          color: '#ef4444',
-          distance: 12,
-          fontSize: 8,
-          formatter: (v: number) => v === 25 ? '25°C' : ''
-        },
-        detail: { show: false },
-        data: [{ value: temperature.value, name: '温度' }]
-      },
-      {
-        name: 'humidity',
-        type: 'gauge',
-        radius: '75%',
-        center: ['50%', '50%'],
-        min: 40,
-        max: 90,
-        startAngle: 90,
-        endAngle: 0,
-        splitNumber: 5,
-        axisLine: {
-          lineStyle: {
-            width: 6,
-            color: [[1, 'rgba(59, 130, 246, 0.4)']]
-          }
-        },
-        pointer: {
-          itemStyle: { color: '#3b82f6' },
-          length: '55%',
-          width: 2.5
-        },
-        axisTick: { show: false },
-        splitLine: {
-          distance: -8,
-          length: 6,
-          lineStyle: { color: '#3b82f6', width: 1.5 }
-        },
-        axisLabel: {
-          color: '#3b82f6',
-          distance: 12,
-          fontSize: 8,
-          formatter: (v: number) => v === 65 ? '65%' : ''
-        },
-        detail: { show: false },
-        data: [{ value: humidity.value, name: '湿度' }]
-      },
+
       {
         name: 'light',
         type: 'gauge',
@@ -276,28 +197,20 @@ const initChart = () => {
     
     const time = Date.now() / 1000
     
-    const tempBase = 24.5
-    const humiBase = 68
     const lightBase = 72
     const co2Base = 450
     
-    temperature.value = tempBase + Math.sin(time * 0.5) * 2 + Math.sin(time * 1.3) * 1.5
-    humidity.value = humiBase + Math.cos(time * 0.7) * 4 + Math.sin(time * 1.1) * 2
     light.value = Math.max(30, Math.min(95, lightBase + Math.sin(time * 0.3) * 15 + Math.random() * 5 - 2.5))
     co2.value = co2Base + Math.cos(time * 0.4) * 20 + Math.random() * 10 - 5
     
-    const tempScore = Math.abs(temperature.value - 25) < 5 ? 95 : Math.max(60, 100 - Math.abs(temperature.value - 25) * 4)
-    const humiScore = Math.abs(humidity.value - 65) < 10 ? 95 : Math.max(50, 100 - Math.abs(humidity.value - 65) * 2)
     const lightScore = light.value > 40 && light.value < 90 ? 90 : Math.max(50, light.value)
     const co2Score = co2.value > 380 && co2.value < 550 ? 95 : Math.max(40, 100 - Math.abs(co2.value - 450) * 0.3)
     
-    balance.value = Math.round((tempScore * 0.25 + humiScore * 0.25 + lightScore * 0.25 + co2Score * 0.25))
+    balance.value = Math.round((lightScore * 0.5 + co2Score * 0.5))
 
     chartInstance.setOption({
       series: [
         { name: '平衡环', data: [{ value: balance.value }] },
-        { name: 'temperature', data: [{ value: temperature.value }] },
-        { name: 'humidity', data: [{ value: humidity.value }] },
         { name: 'light', data: [{ value: light.value }] },
         { name: 'co2', data: [{ value: co2.value }] }
       ]
@@ -332,40 +245,23 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-full glass-panel rounded-xl p-3 flex flex-col" style="min-height: 300px;">
-    <h3 class="text-sm font-semibold text-smart-blue-400 mb-2 flex items-center gap-2">
-      <span class="w-1.5 h-1.5 rounded-full bg-smart-blue-400 animate-pulse"></span>
-      微气候平衡度
-    </h3>
-    <div ref="chartRef" class="flex-1 min-h-[200px]">
-      <div class="w-full h-full flex items-center justify-center">
-        <div class="text-center">
-          <div class="text-3xl font-bold text-smart-blue-400 mb-1">{{ balance }}%</div>
-          <div class="text-xs text-gray-400">协同稳定系数</div>
+  <section class="glass-panel rounded-3xl p-4 border-t border-white/20 relative h-full">
+    <div class="flex items-center gap-2 mb-2">
+      <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+      <span class="text-earth-gold-400 font-bold text-base tracking-wider">微气候平衡度</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-2xl font-bold text-smart-blue-400">{{ balance }}%</div>
+      <div class="flex flex-col gap-1 text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></div>
+          <span class="text-gray-400">光照: <span class="text-earth-gold-400 font-bold">{{ light.toFixed(1) }}%</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-1.5 h-1.5 rounded-full bg-eco-green-500 animate-pulse" style="animation-delay: 0.3s"></div>
+          <span class="text-gray-400">CO₂: <span class="text-eco-green-400 font-bold">{{ co2.toFixed(0) }}ppm</span></span>
         </div>
       </div>
     </div>
-    <div class="flex justify-around mt-1 text-xs">
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-earth-gold-500 mx-auto mb-0.5 animate-pulse"></div>
-        <span class="text-gray-400">温度</span>
-        <p class="text-sm font-bold text-earth-gold-400">{{ temperature.toFixed(1) }}°C</p>
-      </div>
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-smart-blue-500 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.3s"></div>
-        <span class="text-gray-400">湿度</span>
-        <p class="text-sm font-bold text-smart-blue-400">{{ humidity.toFixed(1) }}%</p>
-      </div>
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-earth-gold-400 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.6s"></div>
-        <span class="text-gray-400">光照</span>
-        <p class="text-sm font-bold text-earth-gold-400">{{ light.toFixed(1) }}%</p>
-      </div>
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-eco-green-500 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.9s"></div>
-        <span class="text-gray-400">CO₂</span>
-        <p class="text-sm font-bold text-eco-green-400">{{ co2.toFixed(0) }}ppm</p>
-      </div>
-    </div>
-  </div>
+  </section>
 </template>
