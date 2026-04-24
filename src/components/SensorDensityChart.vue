@@ -215,13 +215,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-full glass-panel rounded-xl p-3 flex flex-col" style="min-height: 300px;">
-    <h3 class="text-sm font-semibold text-smart-blue-400 mb-2 flex items-center gap-2">
-      <span class="w-1.5 h-1.5 rounded-full bg-smart-blue-400 animate-pulse"></span>
-      物联感知密度
-    </h3>
-    <div ref="chartRef" class="flex-1 min-h-[200px]"></div>
-    <div class="flex justify-around mt-1 text-xs">
+  <section class="glass-panel rounded-3xl p-6 flex flex-col overflow-hidden border-t border-white/20 relative">
+    <div class="flex items-center gap-2 mb-3">
+      <div class="w-1 h-4 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+      <span class="text-earth-gold-400 font-bold text-base tracking-wider">物联感知密度</span>
+    </div>
+    <div ref="chartRef" class="flex-1 min-h-0"></div>
+    <div class="flex justify-around mt-2 text-xs">
       <div class="text-center">
         <p class="text-gray-400">传感器密度</p>
         <p class="text-sm font-bold text-smart-blue-400">{{ sensorDensity }}/公顷</p>
@@ -235,5 +235,5 @@ onUnmounted(() => {
         <p class="text-sm font-bold text-earth-gold-400">52个</p>
       </div>
     </div>
-  </div>
+  </section>
 </template>

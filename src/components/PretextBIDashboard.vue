@@ -362,7 +362,7 @@ onUnmounted(() => {
 
         <!-- Right Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-[1.5] flex flex-col overflow-hidden border-t border-white/20 relative">
+          <section class="glass-panel rounded-3xl p-6 flex-[2] flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-4 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -378,7 +378,7 @@ onUnmounted(() => {
               <LightFlow :intensity="80" color="#00ff88" />
             </div>
 
-            <div id="growthChart" class="flex-1 min-h-[300px] h-[300px] relative z-10"></div>
+            <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
             
             <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -406,7 +406,9 @@ onUnmounted(() => {
             </div>
           </section>
 
-          <SensorDensityChart />
+          <div class="flex-1 min-h-0">
+            <SensorDensityChart />
+          </div>
         </aside>
       </div>
 
