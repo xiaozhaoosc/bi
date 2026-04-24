@@ -197,28 +197,20 @@ const initChart = () => {
     
     const time = Date.now() / 1000
     
-    const tempBase = 24.5
-    const humiBase = 68
     const lightBase = 72
     const co2Base = 450
     
-    temperature.value = tempBase + Math.sin(time * 0.5) * 2 + Math.sin(time * 1.3) * 1.5
-    humidity.value = humiBase + Math.cos(time * 0.7) * 4 + Math.sin(time * 1.1) * 2
     light.value = Math.max(30, Math.min(95, lightBase + Math.sin(time * 0.3) * 15 + Math.random() * 5 - 2.5))
     co2.value = co2Base + Math.cos(time * 0.4) * 20 + Math.random() * 10 - 5
     
-    const tempScore = Math.abs(temperature.value - 25) < 5 ? 95 : Math.max(60, 100 - Math.abs(temperature.value - 25) * 4)
-    const humiScore = Math.abs(humidity.value - 65) < 10 ? 95 : Math.max(50, 100 - Math.abs(humidity.value - 65) * 2)
     const lightScore = light.value > 40 && light.value < 90 ? 90 : Math.max(50, light.value)
     const co2Score = co2.value > 380 && co2.value < 550 ? 95 : Math.max(40, 100 - Math.abs(co2.value - 450) * 0.3)
     
-    balance.value = Math.round((tempScore * 0.25 + humiScore * 0.25 + lightScore * 0.25 + co2Score * 0.25))
+    balance.value = Math.round((lightScore * 0.5 + co2Score * 0.5))
 
     chartInstance.setOption({
       series: [
         { name: '平衡环', data: [{ value: balance.value }] },
-        { name: 'temperature', data: [{ value: temperature.value }] },
-        { name: 'humidity', data: [{ value: humidity.value }] },
         { name: 'light', data: [{ value: light.value }] },
         { name: 'co2', data: [{ value: co2.value }] }
       ]
@@ -268,22 +260,12 @@ onUnmounted(() => {
     </div>
     <div class="flex justify-around mt-1 text-xs">
       <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-earth-gold-500 mx-auto mb-0.5 animate-pulse"></div>
-        <span class="text-gray-400">温度</span>
-        <p class="text-sm font-bold text-earth-gold-400">{{ temperature.toFixed(1) }}°C</p>
-      </div>
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-smart-blue-500 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.3s"></div>
-        <span class="text-gray-400">湿度</span>
-        <p class="text-sm font-bold text-smart-blue-400">{{ humidity.toFixed(1) }}%</p>
-      </div>
-      <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-earth-gold-400 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.6s"></div>
+        <div class="w-2 h-2 rounded-full bg-earth-gold-400 mx-auto mb-0.5 animate-pulse"></div>
         <span class="text-gray-400">光照</span>
         <p class="text-sm font-bold text-earth-gold-400">{{ light.toFixed(1) }}%</p>
       </div>
       <div class="text-center">
-        <div class="w-2 h-2 rounded-full bg-eco-green-500 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.9s"></div>
+        <div class="w-2 h-2 rounded-full bg-eco-green-500 mx-auto mb-0.5 animate-pulse" style="animation-delay: 0.3s"></div>
         <span class="text-gray-400">CO₂</span>
         <p class="text-sm font-bold text-eco-green-400">{{ co2.toFixed(0) }}ppm</p>
       </div>
