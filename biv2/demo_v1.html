@@ -117,11 +117,23 @@
             align-items: center;
         }
 
+        .hologram-slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
         .hologram-img {
-            max-width: 90%;
-            max-height: 90%;
-            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
-            animation: float 6s ease-in-out infinite;
+            position: absolute;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .hologram-img.active {
+            opacity: 1;
         }
 
         .hologram-base {
@@ -142,20 +154,41 @@
         }
 
         .value-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(5px);
-            border-radius: 10px;
-            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
             display: flex;
             align-items: center;
             gap: 20px;
-            border-bottom: 2px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 212, 255, 0.1));
+            border-radius: 20px;
+            z-index: 0;
         }
 
         .value-card:hover {
-            border-bottom-color: var(--eco-green);
             background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .value-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .value-icon {
@@ -228,6 +261,11 @@
         <!-- Left: Ecological Galaxy -->
         <aside class="panel">
             <div class="panel-title">
+                碳汇贡献值
+                <span>总贡献: 1200</span>
+            </div>
+            <div id="carbonChart" class="chart-container"></div>
+            <div class="panel-title">
                 生态健康指数
                 <span>实时评分: 94.5</span>
             </div>
@@ -245,7 +283,10 @@
         <!-- Center: Holographic Sand Table -->
         <main class="center-stage">
             <div class="hologram-container">
-                <img src="tea_garden_hologram.png" alt="Tea Garden Hologram" class="hologram-img">
+                <div class="hologram-slider">
+                    <img src="https://images.unsplash.com/photo-1501432377862-3d0432b87475?auto=format&fit=crop&q=80&w=1000" alt="Tea Garden Hologram 1" class="hologram-img active">
+                    <img src="https://images.unsplash.com/photo-1443794103394-703788994360?auto=format&fit=crop&q=80&w=1000" alt="Tea Garden Hologram 2" class="hologram-img">
+                </div>
                 <div class="hologram-base"></div>
             </div>
         </main>
@@ -310,6 +351,37 @@
             document.getElementById('datetime').innerText = now.toLocaleString();
         }, 1000);
 
+        // Carbon Contribution Chart
+        const carbonChart = echarts.init(document.getElementById('carbonChart'));
+        carbonChart.setOption({
+            grid: { top: 10, bottom: 30, left: 40, right: 10 },
+            xAxis: { 
+                type: 'category', 
+                data: ['茶园区域', '林地区域'],
+                axisLabel: { color: '#aaa' }
+            },
+            yAxis: { 
+                type: 'value', 
+                splitLine: { lineStyle: { type: 'dashed', color: '#222' } },
+                axisLabel: { color: '#aaa' }
+            },
+            series: [{
+                data: [700, 500],
+                type: 'bar',
+                itemStyle: {
+                    color: function(params) {
+                        const colors = ['#00ff88', '#00d4ff'];
+                        return colors[params.dataIndex];
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    color: '#fff'
+                }
+            }]
+        });
+
         // Eco Health Radar Chart
         const ecoChart = echarts.init(document.getElementById('ecoChart'));
         ecoChart.setOption({
@@ -372,36 +444,60 @@
             }]
         });
 
-        // Climate Gauge Chart
+        // Climate Radar Chart
         const climateChart = echarts.init(document.getElementById('climateChart'));
         climateChart.setOption({
-            series: [{
-                type: 'gauge',
-                startAngle: 180,
-                endAngle: 0,
-                min: 0,
-                max: 100,
-                splitNumber: 5,
-                progress: { show: true, width: 8, itemStyle: { color: '#00d4ff' } },
-                axisLine: { lineStyle: { width: 8, color: [[1, '#111']] } },
-                axisTick: { show: false },
-                splitLine: { show: false },
-                axisLabel: { show: false },
-                anchor: { show: false },
-                title: { show: false },
-                detail: {
-                    valueAnimation: true,
-                    offsetCenter: [0, -10],
-                    fontSize: 20,
-                    fontWeight: '700',
-                    color: '#fff',
-                    formatter: '{value}%'
+            backgroundColor: 'transparent',
+            radar: {
+                indicator: [
+                    { name: '温度', max: 100 },
+                    { name: '湿度', max: 100 },
+                    { name: '光照', max: 100 },
+                    { name: 'CO₂', max: 100 },
+                    { name: '平衡指数', max: 100 }
+                ],
+                splitArea: { 
+                    show: true,
+                    areaStyle: { color: ['rgba(0, 212, 255, 0.05)', 'rgba(0, 255, 136, 0.05)'] }
                 },
-                data: [{ value: 82.5 }]
+                axisLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.3)' } },
+                splitLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.1)' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    {
+                        value: [65, 75, 80, 55, 70],
+                        name: '当前值',
+                        areaStyle: { color: 'rgba(0, 212, 255, 0.2)' },
+                        lineStyle: { color: 'rgba(0, 212, 255, 0.8)' },
+                        itemStyle: { color: '#00d4ff' }
+                    },
+                    {
+                        value: [70, 80, 75, 60, 85],
+                        name: '理想值',
+                        areaStyle: { color: 'rgba(0, 255, 136, 0.1)' },
+                        lineStyle: { color: 'rgba(0, 255, 136, 0.6)' },
+                        itemStyle: { color: '#00ff88' }
+                    }
+                ]
             }]
         });
 
+        // Image Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hologram-img');
+        
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        
+        setInterval(nextSlide, 5000);
+
         window.addEventListener('resize', () => {
+            carbonChart.resize();
             ecoChart.resize();
             diversityChart.resize();
             growthChart.resize();
