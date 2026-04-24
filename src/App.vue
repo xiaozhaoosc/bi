@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Leaf } from 'lucide-vue-next'
-import EnvironmentPanel from './components/EnvironmentPanel.vue'
-import EcoHealthSphere from './components/EcoHealthSphere.vue'
-import BiodiversityStars from './components/BiodiversityStars.vue'
-import GrowthRhythmChart from './components/GrowthRhythmChart.vue'
-import MicroClimateChart from './components/MicroClimateChart.vue'
-import SensorDensityChart from './components/SensorDensityChart.vue'
-import WarningChart from './components/WarningChart.vue'
-import CommunityValueChart from './components/CommunityValueChart.vue'
-import WaterCycleChart from './components/WaterCycleChart.vue'
+import { Monitor, MessageSquare } from 'lucide-vue-next'
+import PretextBIDashboard from './components/PretextBIDashboard.vue'
+import PretextOptimizedBubbles from './components/PretextOptimizedBubbles.vue'
 
+const currentPage = ref<'dashboard' | 'pretext'>('dashboard')
 const updateTime = ref('')
 const serverDelay = ref(12)
 
@@ -32,76 +26,68 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-full h-screen bg-dark-bg-200 p-2 overflow-hidden flex flex-col">
-    <header class="h-[70px] mb-1.5 flex-shrink-0">
-      <div class="h-full glass-panel rounded-xl p-3 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-eco-green-500 to-smart-blue-600 flex items-center justify-center animate-pulse-glow">
-            <Leaf class="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <h1 class="text-xl font-bold flex items-center gap-2">
-              <span class="text-eco-green-400">时茗园</span>
-              <span class="text-smart-blue-400">茶园</span>
-              <span class="text-earth-gold-400">智慧生态大屏</span>
-            </h1>
-          </div>
-        </div>
-        <EnvironmentPanel />
-      </div>
-    </header>
+  <div class="w-full h-screen bg-dark-bg-200 overflow-hidden flex flex-col">
+    <!-- Overlay Navigation (Minimal) -->
+    <nav class="fixed top-6 right-6 z-50 flex gap-2 bg-black/40 backdrop-blur-xl p-1 rounded-xl border border-white/10">
+      <button
+        @click="currentPage = 'dashboard'"
+        :class="['p-2 rounded-lg transition-all',
+          currentPage === 'dashboard' ? 'bg-white/20 text-white' : 'text-gray-500 hover:text-white'
+        ]"
+        title="大屏视图"
+      >
+        <Monitor class="w-5 h-5" />
+      </button>
+      <button
+        @click="currentPage = 'pretext'"
+        :class="['p-2 rounded-lg transition-all',
+          currentPage === 'pretext' ? 'bg-white/20 text-white' : 'text-gray-500 hover:text-white'
+        ]"
+        title="技术演示"
+      >
+        <MessageSquare class="w-5 h-5" />
+      </button>
+    </nav>
 
-    <main class="flex-1 flex flex-col gap-1.5 overflow-hidden">
-      <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
-        <div class="col-span-3 h-full min-h-0">
-          <EcoHealthSphere />
+    <main class="flex-1 relative overflow-hidden">
+      <Transition name="fade" mode="out-in">
+        <div v-if="currentPage === 'dashboard'" class="w-full h-full">
+          <PretextBIDashboard />
         </div>
-        <div class="col-span-3 h-full min-h-0">
-          <BiodiversityStars />
+        <div v-else class="w-full h-full p-8">
+          <PretextOptimizedBubbles />
         </div>
-        <div class="col-span-3 h-full min-h-0">
-          <GrowthRhythmChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <MicroClimateChart />
-        </div>
-      </div>
-      <div class="flex-1 grid grid-cols-12 gap-1.5 min-h-0">
-        <div class="col-span-3 h-full min-h-0">
-          <SensorDensityChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <WarningChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <CommunityValueChart />
-        </div>
-        <div class="col-span-3 h-full min-h-0">
-          <WaterCycleChart />
-        </div>
-      </div>
+      </Transition>
     </main>
 
-    <footer class="h-[55px] flex-shrink-0 mt-1.5">
-      <div class="h-full glass-panel rounded-xl p-3">
-        <div class="h-full flex items-center justify-between text-sm text-gray-400">
-          <div class="flex items-center gap-4">
-            <span class="flex items-center gap-2">
-              <span class="w-1 h-1 rounded-full bg-eco-green-400 animate-pulse"></span>
-              <span>数据更新时间:</span>
-              <span class="text-eco-green-400 font-mono">{{ updateTime }}</span>
-            </span>
-            <span>系统版本: v1.0.0</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-eco-green-400 animate-pulse"></span>
-              在线状态
-            </span>
-            <span>服务端延迟: <span class="text-smart-blue-400 font-mono">{{ serverDelay }}ms</span></span>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <!-- Global Info Bar (Bottom Right) -->
+    <div class="fixed bottom-4 right-6 z-50 flex items-center gap-4 text-[10px] text-gray-500 font-mono pointer-events-none">
+      <span>SERVER_DELAY: {{ serverDelay }}ms</span>
+      <span>SYSTEM_V1.0.0</span>
+      <span>UPDATED: {{ updateTime }}</span>
+    </div>
   </div>
 </template>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Orbitron:wght@400;700&display=swap');
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Ensure font is available globally for Pretext */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #020617;
+  font-family: "Noto Sans SC", sans-serif;
+}
+</style>
