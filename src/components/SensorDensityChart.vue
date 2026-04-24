@@ -26,9 +26,9 @@ const initChart = () => {
           value: [10 + i * 11.25, 10 + j * 11.25],
           symbolSize: 6 + Math.random() * 8,
           itemStyle: {
-            color: '#3b82f6',
+            color: '#00ff88',
             shadowBlur: 15,
-            shadowColor: '#3b82f6',
+            shadowColor: '#00ff88',
             opacity: 0.6 + Math.random() * 0.4
           },
           blinkPhase: Math.random() * Math.PI * 2,
@@ -49,7 +49,7 @@ const initChart = () => {
           source: i,
           target: j,
           lineStyle: {
-            color: 'rgba(59, 130, 246, 0.2)',
+            color: 'rgba(0, 255, 136, 0.2)',
             width: 1
           }
         })
@@ -71,7 +71,7 @@ const initChart = () => {
     backgroundColor: 'transparent',
     tooltip: {
       backgroundColor: 'rgba(15, 23, 42, 0.95)',
-      borderColor: '#3b82f6',
+      borderColor: '#00ff88',
       borderWidth: 1,
       padding: [10, 14],
       textStyle: {
@@ -122,11 +122,11 @@ const initChart = () => {
           focus: 'adjacency',
           lineStyle: {
             width: 2,
-            color: '#3b82f6'
+            color: '#00ff88'
           },
           itemStyle: {
             shadowBlur: 25,
-            shadowColor: '#3b82f6'
+            shadowColor: '#00ff88'
           }
         },
         roam: false,
@@ -139,15 +139,15 @@ const initChart = () => {
           value: s.value,
           symbolSize: 30,
           itemStyle: {
-            color: 'rgba(59, 130, 246, 0.1)',
-            borderColor: '#3b82f6',
+            color: 'rgba(0, 255, 136, 0.1)',
+            borderColor: '#00ff88',
             borderWidth: 1
           },
           effect: {
             show: true,
             period: 3 + Math.random(),
             scale: 1.5,
-            color: '#3b82f6'
+            color: '#00ff88'
           }
         })),
         z: 0
@@ -217,14 +217,14 @@ onUnmounted(() => {
 <template>
   <section class="glass-panel rounded-3xl p-4 flex flex-col overflow-hidden border-t border-white/20 relative h-full">
     <div class="flex items-center gap-2 mb-2">
-      <div class="w-1 h-4 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+      <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
       <span class="text-earth-gold-400 font-bold text-base tracking-wider">物联感知密度</span>
     </div>
     <div ref="chartRef" class="flex-1 min-h-[140px]"></div>
     <div class="flex justify-around mt-1 text-xs">
       <div class="text-center">
         <p class="text-gray-400">传感器密度</p>
-        <p class="text-sm font-bold text-smart-blue-400">{{ sensorDensity }}/公顷</p>
+        <p class="text-sm font-bold text-eco-green-400">{{ sensorDensity }}/公顷</p>
       </div>
       <div class="text-center">
         <p class="text-gray-400">数据类型</p>
@@ -232,7 +232,7 @@ onUnmounted(() => {
       </div>
       <div class="text-center">
         <p class="text-gray-400">覆盖节点</p>
-        <p class="text-sm font-bold text-earth-gold-400">52个</p>
+        <p class="text-sm font-bold text-eco-green-400">52个</p>
       </div>
     </div>
   </section>

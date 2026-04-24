@@ -4,9 +4,7 @@ import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
 import * as echarts from 'echarts'
 import MicroClimateChart from './MicroClimateChart.vue'
 import SensorDensityChart from './SensorDensityChart.vue'
-import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
-import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
 // 状态管理
@@ -14,7 +12,6 @@ const isFullscreen = ref(false)
 const currentTime = ref('')
 const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
-const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
 const currentTimelineIndex = ref(0)
 
 // 模拟不同节气的数据
