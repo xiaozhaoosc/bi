@@ -1,43 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { Fullscreen, Minimize2 } from 'lucide-vue-next'
 import * as echarts from 'echarts'
 import MicroClimateChart from './MicroClimateChart.vue'
 import SensorDensityChart from './SensorDensityChart.vue'
-import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
-import TimelineSlider from './visuals/TimelineSlider.vue'
-import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
 // 状态管理
 const isFullscreen = ref(false)
 const currentTime = ref('')
 const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
-const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
-const currentTimelineIndex = ref(0)
-
-// 模拟不同节气的数据
-const seasonalData = [
-  // 谷雨 (Q1)
-  { ecoRadar: [75, 82, 90, 85, 80], diversity: [10, 30, 90, 60], climate: 72.5, footerValues: [85.0, 32, 72.5, 280] },
-  // 立夏 (Q2)
-  { ecoRadar: [80, 88, 95, 88, 85], diversity: [12, 35, 100, 70], climate: 78.0, footerValues: [90.5, 38, 78.0, 300] },
-  // 小满 (Q3)
-  { ecoRadar: [82, 90, 96, 89, 86], diversity: [14, 40, 110, 75], climate: 80.5, footerValues: [92.0, 40, 80.5, 310] },
-  // 芒种 (Q4)
-  { ecoRadar: [85, 92, 98, 90, 88], diversity: [15, 45, 120, 80], climate: 82.5, footerValues: [94.5, 42, 82.5, 320] }
-]
-
-watch(currentTimelineIndex, (newIdx) => {
-  const data = seasonalData[newIdx]
-  if (ecoChart) ecoChart.setOption({ series: [{ data: [{ value: data.ecoRadar }] }] })
-  if (diversityChart) diversityChart.setOption({ series: [{ data: data.diversity }] })
-})
 
 // 图表实例
 let ecoChart: echarts.ECharts | null = null
-let diversityChart: echarts.ECharts | null = null
 let growthChart: echarts.ECharts | null = null
 
 const toggleFullscreen = () => {
@@ -94,25 +70,6 @@ const initCharts = () => {
     }]
   })
 
-  diversityChart = echarts.init(document.getElementById('diversityChart'))
-  diversityChart.setOption({
-    grid: { top: 20, bottom: 30, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['鸟类', '昆虫', '植物', '微生物'], axisLabel: { color: '#888' } },
-    yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#333' } }, axisLabel: { color: '#888' } },
-    series: [{
-      data: [15, 45, 120, 80],
-      type: 'bar',
-      barWidth: '40%',
-      itemStyle: { 
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#00ff88' },
-          { offset: 1, color: '#00d4ff' }
-        ]),
-        borderRadius: [4, 4, 0, 0]
-      }
-    }]
-  })
-
   growthChart = echarts.init(document.getElementById('growthChart'))
   growthChart.setOption({
     grid: { top: 20, bottom: 30, left: 40, right: 10 },
@@ -147,7 +104,6 @@ const initCharts = () => {
 const handleResize = () => {
   updateScale()
   ecoChart?.resize()
-  diversityChart?.resize()
   growthChart?.resize()
 }
 
@@ -164,7 +120,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
   ecoChart?.dispose()
-  diversityChart?.dispose()
   growthChart?.dispose()
 })
 </script>
@@ -205,7 +160,106 @@ onUnmounted(() => {
       <div class="grid grid-cols-12 gap-8 flex-1 min-h-0">
         <!-- Left Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
+          <!-- Bubble Metrics - New Position -->
+          <section class="glass-panel rounded-3xl p-6 flex-[1.5] flex flex-col overflow-hidden border-t border-white/20 relative">
+            <div class="flex items-center justify-between mb-2 relative z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生态指标</span>
+              </div>
+            </div>
+            
+            <div class="flex-1 grid grid-cols-2 gap-4 p-2">
+              <!-- Top Left Bubble -->
+              <div class="glass-panel p-4 rounded-xl border border-eco-green-400/30 shadow-[0_0_20px_rgba(0,255,136,0.2)] backdrop-blur-md flex flex-col justify-center">
+                <span class="text-eco-green-400 mb-1 block font-['Noto_Sans_SC'] text-sm">碳汇贡献值</span>
+                <div class="block">
+                  <span class="font-['Orbitron'] font-bold text-xl text-eco-green-400">124.5</span>
+                  <span class="font-['Noto_Sans_SC'] font-bold text-sm text-eco-green-400"> t</span>
+                </div>
+              </div>
+
+              <!-- Top Right Bubble -->
+              <div class="glass-panel p-4 rounded-xl border border-smart-blue-400/30 shadow-[0_0_20px_rgba(0,212,255,0.2)] backdrop-blur-md flex flex-col justify-center">
+                <span class="text-smart-blue-400 mb-1 block font-['Noto_Sans_SC'] text-sm text-right">水资源智慧循环</span>
+                <div class="block text-right">
+                  <span class="font-['Orbitron'] font-bold text-xl text-smart-blue-400">98.2</span>
+                  <span class="font-['Noto_Sans_SC'] font-bold text-sm text-smart-blue-400"> %</span>
+                </div>
+              </div>
+
+              <!-- Bottom Left Bubble -->
+              <div class="glass-panel p-4 rounded-xl border border-earth-gold-400/30 shadow-[0_0_20px_rgba(255,204,51,0.2)] backdrop-blur-md flex flex-col justify-center">
+                <span class="text-earth-gold-400 mb-1 block font-['Noto_Sans_SC'] text-sm">光合效率指数</span>
+                <div class="block">
+                  <span class="font-['Orbitron'] font-bold text-xl text-earth-gold-400">85.0</span>
+                  <span class="font-['Noto_Sans_SC'] font-bold text-sm text-earth-gold-400"> %</span>
+                </div>
+              </div>
+
+              <!-- Bottom Right Bubble -->
+              <div class="glass-panel p-4 rounded-xl border border-purple-400/30 shadow-[0_0_20px_rgba(168,85,247,0.2)] backdrop-blur-md flex flex-col justify-center">
+                <span class="text-purple-400 mb-1 block font-['Noto_Sans_SC'] text-sm text-right">社区共生价值</span>
+                <div class="block text-right">
+                  <span class="font-['Orbitron'] font-bold text-xl text-purple-400">320</span>
+                  <span class="font-['Noto_Sans_SC'] font-bold text-sm text-purple-400"> 万</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Small Growth Chart - New Position -->
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
+            <div class="flex items-center justify-between mb-2 relative z-10">
+              <div class="flex items-center gap-2">
+                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">智慧生长图谱</span>
+              </div>
+              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
+                AI 决策建议
+              </div>
+            </div>
+            
+            <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
+          </section>
+        </aside>
+
+        <!-- Center Stage -->
+        <main class="col-span-6 relative perspective-lg preserve-3d">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <!-- 3D Tea Garden Model -->
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="relative w-[600px] h-[600px] flex items-center justify-center">
+                <img 
+                  src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
+                  alt="Tea Garden Digital Twin" 
+                  class="max-w-full max-h-full object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
+                />
+                <!-- Digital Grid Overlay -->
+                <div class="absolute inset-0 pointer-events-none">
+                  <div class="w-full h-full border border-eco-green-400/30 rounded-lg"></div>
+                  <div class="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none">
+                    <div v-for="i in 100" :key="i" class="border border-eco-green-400/10"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
+            <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
+          </div>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
+          <!-- MicroClimate Chart - New Position -->
+          <MicroClimateChart />
+
+          <!-- Sensor Density Chart - New Position -->
+          <SensorDensityChart />
+
+          <!-- Eco Health Chart - New Position -->
+          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-2 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -232,141 +286,6 @@ onUnmounted(() => {
             <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/10 rounded-br-lg"></div>
           </section>
 
-          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
-            <div class="flex flex-col gap-2 mb-4 relative z-10">
-              <div class="flex items-center gap-2">
-                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性丰度</span>
-              </div>
-              <div class="flex flex-col gap-1 mt-2 text-xs">
-                <div class="flex items-center gap-2">
-                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">声纹识别</span>
-                  <span class="text-gray-400">检测到珍稀鸟类: <span class="text-white">3种</span></span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">影像追踪</span>
-                  <span class="text-gray-400">活跃物种: <span class="text-white">42种</span></span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Eco Galaxy Particle Effect -->
-            <EcoGalaxy color="#00d4ff" />
-
-            <div id="diversityChart" class="flex-1 min-h-0 relative z-10"></div>
-          </section>
-        </aside>
-
-        <!-- Center Stage -->
-        <main class="col-span-6 relative perspective-lg preserve-3d">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <!-- 3D Tea Garden Model -->
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="relative w-[600px] h-[600px] flex items-center justify-center">
-                <img 
-                  src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
-                  alt="Tea Garden Digital Twin" 
-                  class="max-w-full max-h-full object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
-                />
-                <!-- Digital Grid Overlay -->
-                <div class="absolute inset-0 pointer-events-none">
-                  <div class="w-full h-full border border-eco-green-400/30 rounded-lg"></div>
-                  <div class="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none">
-                    <div v-for="i in 100" :key="i" class="border border-eco-green-400/10"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Pretext Bubbles -->
-            <div class="absolute inset-0 pointer-events-none">
-              <!-- Top Left Bubble -->
-              <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-eco-green-400/30 shadow-[0_0_30px_rgba(0,255,136,0.3)] backdrop-blur-md">
-                  <span class="text-eco-green-400 mb-2 block font-['Noto_Sans_SC'] text-base">碳汇贡献值</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-eco-green-400">124.5</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-eco-green-400"> t</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Top Right Bubble -->
-              <div class="absolute top-1/4 right-1/4 transform translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-smart-blue-400/30 shadow-[0_0_30px_rgba(0,212,255,0.3)] backdrop-blur-md">
-                  <span class="text-smart-blue-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">水资源智慧循环</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-smart-blue-400">98.2</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-smart-blue-400"> %</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bottom Left Bubble -->
-              <div class="absolute bottom-1/4 left-1/4 transform -translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-earth-gold-400/30 shadow-[0_0_30px_rgba(255,204,51,0.3)] backdrop-blur-md">
-                  <span class="text-earth-gold-400 mb-2 block font-['Noto_Sans_SC'] text-base">光合效率指数</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-earth-gold-400">85.0</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-earth-gold-400"> %</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Bottom Right Bubble -->
-              <div class="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.3)] backdrop-blur-md">
-                  <span class="text-purple-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">社区共生价值</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-purple-400">320</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-purple-400"> 万</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
-            <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
-
-            <!-- Time-space Travel Slider -->
-            <div class="absolute bottom-4 w-[600px] z-30">
-               <TimelineSlider :options="timelineOptions" v-model="currentTimelineIndex" />
-            </div>
-          </div>
-        </main>
-
-        <!-- Right Panel -->
-        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
-            <div class="flex items-center justify-between mb-4 relative z-10">
-              <div class="flex items-center gap-2">
-                <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">智慧生长图谱</span>
-              </div>
-              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
-                AI 决策建议
-              </div>
-            </div>
-            
-            <!-- Tron Light Flow Overlay -->
-            <div class="absolute inset-x-6 top-20 bottom-6 opacity-40 pointer-events-none">
-              <LightFlow :intensity="80" color="#00ff88" />
-            </div>
-
-            <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
-            
-            <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <Cpu class="w-4 h-4 text-eco-green-500" />
-                <span class="text-gray-500 uppercase tracking-tighter text-xs">AI 产量预测</span>
-              </div>
-              <span class="text-eco-green-500 font-mono text-sm font-bold">Q3 预期产量: +12.4%</span>
-            </div>
-
-          </section>
-
-          <MicroClimateChart />
-
           <section class="glass-panel rounded-3xl p-6 border-t border-white/20 relative">
             <div class="flex items-center gap-2 mb-4">
               <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -382,8 +301,6 @@ onUnmounted(() => {
               </div>
             </div>
           </section>
-
-          <SensorDensityChart />
         </aside>
       </div>
 
