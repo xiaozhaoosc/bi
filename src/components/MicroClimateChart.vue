@@ -7,8 +7,6 @@ let chartInstance: echarts.ECharts | null = null
 let updateInterval: ReturnType<typeof setInterval> | null = null
 
 const balance = ref(85)
-const temperature = ref(24.5)
-const humidity = ref(68)
 const light = ref(72)
 const co2 = ref(450)
 
@@ -32,8 +30,6 @@ const initChart = () => {
       formatter: (params: any) => {
         const name = params.seriesName as string
         const indicators: Record<string, { name: string; value: number; unit: string; color: string }> = {
-          temperature: { name: '温度', value: temperature.value, unit: '°C', color: '#ef4444' },
-          humidity: { name: '湿度', value: humidity.value, unit: '%', color: '#3b82f6' },
           light: { name: '光照', value: light.value, unit: '%', color: '#eab308' },
           co2: { name: 'CO₂', value: co2.value, unit: 'ppm', color: '#22c55e' }
         }
@@ -56,9 +52,7 @@ const initChart = () => {
           lineStyle: {
             width: 12,
             color: [
-              [0.25, 'rgba(239, 68, 68, 0.3)'],
-              [0.5, 'rgba(59, 130, 246, 0.3)'],
-              [0.75, 'rgba(234, 179, 8, 0.3)'],
+              [0.5, 'rgba(234, 179, 8, 0.3)'],
               [1, 'rgba(34, 197, 94, 0.3)']
             ]
           }
@@ -79,9 +73,7 @@ const initChart = () => {
               x2: 1,
               y2: 1,
               colorStops: [
-                { offset: 0, color: '#ef4444' },
-                { offset: 0.33, color: '#3b82f6' },
-                { offset: 0.66, color: '#eab308' },
+                { offset: 0, color: '#eab308' },
                 { offset: 1, color: '#22c55e' }
               ]
             }
@@ -97,78 +89,7 @@ const initChart = () => {
           show: false
         }
       },
-      {
-        name: 'temperature',
-        type: 'gauge',
-        radius: '75%',
-        center: ['50%', '50%'],
-        min: 15,
-        max: 35,
-        startAngle: 180,
-        endAngle: 90,
-        splitNumber: 5,
-        axisLine: {
-          lineStyle: {
-            width: 6,
-            color: [[1, 'rgba(239, 68, 68, 0.4)']]
-          }
-        },
-        pointer: {
-          itemStyle: { color: '#ef4444' },
-          length: '55%',
-          width: 2.5
-        },
-        axisTick: { show: false },
-        splitLine: {
-          distance: -8,
-          length: 6,
-          lineStyle: { color: '#ef4444', width: 1.5 }
-        },
-        axisLabel: {
-          color: '#ef4444',
-          distance: 12,
-          fontSize: 8,
-          formatter: (v: number) => v === 25 ? '25°C' : ''
-        },
-        detail: { show: false },
-        data: [{ value: temperature.value, name: '温度' }]
-      },
-      {
-        name: 'humidity',
-        type: 'gauge',
-        radius: '75%',
-        center: ['50%', '50%'],
-        min: 40,
-        max: 90,
-        startAngle: 90,
-        endAngle: 0,
-        splitNumber: 5,
-        axisLine: {
-          lineStyle: {
-            width: 6,
-            color: [[1, 'rgba(59, 130, 246, 0.4)']]
-          }
-        },
-        pointer: {
-          itemStyle: { color: '#3b82f6' },
-          length: '55%',
-          width: 2.5
-        },
-        axisTick: { show: false },
-        splitLine: {
-          distance: -8,
-          length: 6,
-          lineStyle: { color: '#3b82f6', width: 1.5 }
-        },
-        axisLabel: {
-          color: '#3b82f6',
-          distance: 12,
-          fontSize: 8,
-          formatter: (v: number) => v === 65 ? '65%' : ''
-        },
-        detail: { show: false },
-        data: [{ value: humidity.value, name: '湿度' }]
-      },
+
       {
         name: 'light',
         type: 'gauge',
