@@ -26,9 +26,9 @@ const initChart = () => {
           value: [10 + i * 11.25, 10 + j * 11.25],
           symbolSize: 6 + Math.random() * 8,
           itemStyle: {
-            color: '#3b82f6',
+            color: '#00ff88',
             shadowBlur: 15,
-            shadowColor: '#3b82f6',
+            shadowColor: '#00ff88',
             opacity: 0.6 + Math.random() * 0.4
           },
           blinkPhase: Math.random() * Math.PI * 2,
@@ -122,11 +122,11 @@ const initChart = () => {
           focus: 'adjacency',
           lineStyle: {
             width: 2,
-            color: '#3b82f6'
+            color: '#00ff88'
           },
           itemStyle: {
             shadowBlur: 25,
-            shadowColor: '#3b82f6'
+            shadowColor: '#00ff88'
           }
         },
         roam: false,
@@ -139,15 +139,15 @@ const initChart = () => {
           value: s.value,
           symbolSize: 30,
           itemStyle: {
-            color: 'rgba(59, 130, 246, 0.1)',
-            borderColor: '#3b82f6',
+            color: 'rgba(0, 212, 255, 0.1)',
+            borderColor: '#00d4ff',
             borderWidth: 1
           },
           effect: {
             show: true,
             period: 3 + Math.random(),
             scale: 1.5,
-            color: '#3b82f6'
+            color: '#00d4ff'
           }
         })),
         z: 0

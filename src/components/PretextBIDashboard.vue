@@ -8,11 +8,15 @@ import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
 import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
+import PretextBubble from './PretextBubble.vue'
 
 // 状态管理
 const isFullscreen = ref(false)
 const currentTime = ref('')
 const dashboardRef = ref<HTMLElement | null>(null)
+const growthChartRef = ref<HTMLElement | null>(null)
+const ecoChartRef = ref<HTMLElement | null>(null)
+const diversityChartRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
 const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
 const currentTimelineIndex = ref(0)
@@ -28,6 +32,8 @@ const seasonalData = [
   // 芒种 (Q4)
   { ecoRadar: [85, 92, 98, 90, 88], diversity: [15, 45, 120, 80], climate: 82.5, footerValues: [94.5, 42, 82.5, 320] }
 ]
+
+import { nextTick } from 'vue'
 
 watch(currentTimelineIndex, (newIdx) => {
   const data = seasonalData[newIdx]
@@ -67,69 +73,75 @@ const updateScale = () => {
 }
 
 const initCharts = () => {
-  ecoChart = echarts.init(document.getElementById('ecoChart'))
-  ecoChart.setOption({
-    backgroundColor: 'transparent',
-    radar: {
-      indicator: [
-        { name: '生物多样性', max: 100 },
-        { name: '土壤健康', max: 100 },
-        { name: '空气质量', max: 100 },
-        { name: '水质指标', max: 100 },
-        { name: '生态平衡', max: 100 }
-      ],
-      name: { textStyle: { color: '#888', fontSize: 12 } },
-      splitArea: { show: false },
-      axisLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.3)' } },
-      splitLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.1)' } }
-    },
-    series: [{
-      type: 'radar',
-      data: [{
-        value: [85, 92, 98, 90, 88],
-        areaStyle: { color: 'rgba(0, 255, 136, 0.2)' },
-        lineStyle: { color: 'rgba(0, 255, 136, 0.8)', width: 2 },
-        itemStyle: { color: '#00ff88' }
+  if (ecoChartRef.value) {
+    if (ecoChart) ecoChart.dispose()
+    ecoChart = echarts.init(ecoChartRef.value)
+    ecoChart.setOption({
+      backgroundColor: 'transparent',
+      radar: {
+        indicator: [
+          { name: '生物多样性', max: 100 },
+          { name: '土壤健康', max: 100 },
+          { name: '空气质量', max: 100 },
+          { name: '水质指标', max: 100 },
+          { name: '生态平衡', max: 100 }
+        ],
+        axisName: { color: '#888', fontSize: 10 },
+        splitArea: { show: false },
+        axisLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.3)' } },
+        splitLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.1)' } }
+      },
+      series: [{
+        type: 'radar',
+        data: [{
+          value: [85, 92, 98, 90, 88],
+          areaStyle: { color: 'rgba(0, 255, 136, 0.2)' },
+          lineStyle: { color: 'rgba(0, 255, 136, 0.8)', width: 2 },
+          itemStyle: { color: '#00ff88' }
+        }]
       }]
-    }]
-  })
+    })
+  }
 
-  diversityChart = echarts.init(document.getElementById('diversityChart'))
-  diversityChart.setOption({
-    grid: { top: 20, bottom: 30, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['鸟类', '昆虫', '植物', '微生物'], axisLabel: { color: '#888' } },
-    yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: '#333' } }, axisLabel: { color: '#888' } },
-    series: [{
-      data: [15, 45, 120, 80],
-      type: 'bar',
-      barWidth: '40%',
-      itemStyle: { 
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#00ff88' },
-          { offset: 1, color: '#00d4ff' }
-        ]),
-        borderRadius: [4, 4, 0, 0]
-      }
-    }]
-  })
+  if (diversityChartRef.value) {
+    if (diversityChart) diversityChart.dispose()
+    diversityChart = echarts.init(diversityChartRef.value)
+    diversityChart.setOption({
+      grid: { top: 20, bottom: 30, left: 40, right: 10 },
+      xAxis: { type: 'category', data: ['鸟类', '昆虫', '植物', '微生物'], axisLabel: { color: '#888', fontSize: 10 } },
+      yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed', color: 'rgba(255,255,255,0.05)' } }, axisLabel: { color: '#888', fontSize: 10 } },
+      series: [{
+        data: [15, 45, 120, 80],
+        type: 'bar',
+        barWidth: '40%',
+        itemStyle: { 
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#00ff88' },
+            { offset: 1, color: '#00d4ff' }
+          ]),
+          borderRadius: [4, 4, 0, 0]
+        }
+      }]
+    })
+  }
 
-  const growthChartDom = document.getElementById('growthChart')
-  if (growthChartDom) {
-    growthChart = echarts.init(growthChartDom)
+  if (growthChartRef.value) {
+    if (growthChart) growthChart.dispose()
+    growthChart = echarts.init(growthChartRef.value)
     growthChart.setOption({
       backgroundColor: 'transparent',
-      grid: { top: 20, bottom: 30, left: 40, right: 10 },
+      grid: { top: 30, bottom: 40, left: 50, right: 20 },
       xAxis: { 
         type: 'category', 
         data: ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满'], 
-        axisLabel: { color: '#888' },
-        axisLine: { lineStyle: { color: '#444' } }
+        axisLabel: { color: '#888', fontSize: 10 },
+        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
       },
       yAxis: { 
         type: 'value', 
-        axisLabel: { color: '#888' }, 
-        splitLine: { lineStyle: { color: '#333' } },
-        axisLine: { lineStyle: { color: '#444' } }
+        axisLabel: { color: '#888', fontSize: 10 }, 
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)', type: 'dashed' } },
+        axisLine: { show: false }
       },
       series: [{
         data: [25, 32, 40, 55, 65, 80, 90, 95],
@@ -140,19 +152,19 @@ const initCharts = () => {
         color: '#00ff88',
         lineStyle: { 
           color: '#00ff88', 
-          width: 3
+          width: 3,
+          shadowBlur: 10,
+          shadowColor: 'rgba(0, 255, 136, 0.5)'
         },
         itemStyle: { 
           color: '#00ff88',
-          borderColor: '#00ff88',
-          borderWidth: 2,
-          shadowBlur: 10,
-          shadowColor: '#00ff88'
+          borderColor: '#fff',
+          borderWidth: 2
         },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(0, 255, 136, 0.3)' },
-            { offset: 1, color: 'rgba(0, 255, 136, 0.05)' }
+            { offset: 0, color: 'rgba(0, 255, 136, 0.4)' },
+            { offset: 1, color: 'rgba(0, 255, 136, 0)' }
           ])
         }
       }]
@@ -174,16 +186,27 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
   
-  // 确保DOM完全渲染后再初始化图表
-  setTimeout(() => {
+  // 更加健壮的初始化逻辑
+  nextTick(() => {
     initCharts()
-    // 再次调整大小确保图表正确显示
-    setTimeout(() => {
-      ecoChart?.resize()
-      diversityChart?.resize()
-      growthChart?.resize()
-    }, 100)
-  }, 100)
+    
+    // 监听容器大小变化
+    const observer = new ResizeObserver(() => {
+      handleResize()
+    })
+    
+    if (growthChartRef.value) observer.observe(growthChartRef.value)
+    if (ecoChartRef.value) observer.observe(ecoChartRef.value)
+    if (diversityChartRef.value) observer.observe(diversityChartRef.value)
+    
+    // 多次尝试 resize 以应对复杂的布局加载
+    [100, 500, 1000, 2000].forEach(delay => {
+      setTimeout(() => {
+        handleResize()
+        if (growthChart) growthChart.setOption({}, false)
+      }, delay)
+    })
+  })
 })
 
 onUnmounted(() => {
@@ -211,8 +234,10 @@ onUnmounted(() => {
       <!-- Header -->
       <header class="flex justify-between items-start mb-10">
         <div class="flex flex-col gap-2">
-          <h1 class="text-4xl font-bold tracking-[4px] bg-gradient-to-r from-eco-green-400 to-smart-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,136,0.3)] font-['Orbitron']">
+          <h1 class="text-4xl font-bold tracking-[4px] bg-gradient-to-r from-eco-green-400 to-smart-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,136,0.3)] font-['Orbitron'] relative">
             时茗园 · 生态守护全景
+            <!-- Ray Tracing Effect Under Title -->
+            <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-eco-green-400 to-transparent animate-ray-trace"></div>
           </h1>
         </div>
         
@@ -251,7 +276,7 @@ onUnmounted(() => {
               <EcoScanner color="#00ff88" />
             </div>
 
-            <div id="ecoChart" class="flex-1 min-h-0 relative z-10"></div>
+            <div ref="ecoChartRef" class="flex-1 min-h-0 relative z-10"></div>
             
             <!-- Decorative Corners -->
             <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-white/10 rounded-tl-lg"></div>
@@ -281,7 +306,7 @@ onUnmounted(() => {
             <!-- Eco Galaxy Particle Effect -->
             <EcoGalaxy color="#00d4ff" />
 
-            <div id="diversityChart" class="flex-1 min-h-0 relative z-10"></div>
+            <div ref="diversityChartRef" class="flex-1 min-h-0 relative z-10"></div>
           </section>
         </aside>
 
@@ -306,50 +331,38 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Pretext Bubbles -->
+            <!-- Pretext Bubbles (Optimized Positions) -->
             <div class="absolute inset-0 pointer-events-none">
               <!-- Top Left Bubble -->
-              <div class="absolute top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-eco-green-400/30 shadow-[0_0_30px_rgba(0,255,136,0.3)] backdrop-blur-md">
-                  <span class="text-eco-green-400 mb-2 block font-['Noto_Sans_SC'] text-base">碳汇贡献值</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-eco-green-400">124.5</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-eco-green-400"> t</span>
-                  </div>
-                </div>
+              <div class="absolute top-[18%] left-[24%] transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+                <PretextBubble text="124.5" theme="green" class="animate-float">
+                  <template #label>碳汇贡献值</template>
+                  <template #unit>t</template>
+                </PretextBubble>
               </div>
 
               <!-- Top Right Bubble -->
-              <div class="absolute top-1/4 right-1/4 transform translate-x-1/2 -translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-smart-blue-400/30 shadow-[0_0_30px_rgba(0,212,255,0.3)] backdrop-blur-md">
-                  <span class="text-smart-blue-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">水资源智慧循环</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-smart-blue-400">98.2</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-smart-blue-400"> %</span>
-                  </div>
-                </div>
+              <div class="absolute top-[18%] right-[24%] transform translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+                <PretextBubble text="98.2" theme="blue" class="animate-float" style="animation-delay: -1.5s">
+                  <template #label>水资源智慧循环</template>
+                  <template #unit>%</template>
+                </PretextBubble>
               </div>
 
               <!-- Bottom Left Bubble -->
-              <div class="absolute bottom-1/4 left-1/4 transform -translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-earth-gold-400/30 shadow-[0_0_30px_rgba(255,204,51,0.3)] backdrop-blur-md">
-                  <span class="text-earth-gold-400 mb-2 block font-['Noto_Sans_SC'] text-base">光合效率指数</span>
-                  <div class="block">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-earth-gold-400">85.0</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-earth-gold-400"> %</span>
-                  </div>
-                </div>
+              <div class="absolute bottom-[22%] left-[24%] transform -translate-x-1/2 translate-y-1/2 pointer-events-auto">
+                <PretextBubble text="85.0" theme="gold" class="animate-float" style="animation-delay: -3s">
+                  <template #label>光合效率指数</template>
+                  <template #unit>%</template>
+                </PretextBubble>
               </div>
 
               <!-- Bottom Right Bubble -->
-              <div class="absolute bottom-1/4 right-1/4 transform translate-x-1/2 translate-y-1/2">
-                <div class="glass-panel p-6 rounded-2xl border border-purple-400/30 shadow-[0_0_30px_rgba(168,85,247,0.3)] backdrop-blur-md">
-                  <span class="text-purple-400 mb-2 block font-['Noto_Sans_SC'] text-base text-right">社区共生价值</span>
-                  <div class="block text-right">
-                    <span class="font-['Orbitron'] font-bold text-2xl text-purple-400">320</span>
-                    <span class="font-['Noto_Sans_SC'] font-bold text-lg text-purple-400"> 万</span>
-                  </div>
-                </div>
+              <div class="absolute bottom-[22%] right-[24%] transform translate-x-1/2 translate-y-1/2 pointer-events-auto">
+                <PretextBubble text="320" theme="purple" class="animate-float" style="animation-delay: -4.5s">
+                  <template #label>社区共生价值</template>
+                  <template #unit>万</template>
+                </PretextBubble>
               </div>
             </div>
 
@@ -378,14 +391,23 @@ onUnmounted(() => {
               <LightFlow :intensity="80" color="#00ff88" />
             </div>
 
-            <div id="growthChart" class="flex-1 min-h-[300px] h-[300px] relative z-10"></div>
+            <div ref="growthChartRef" class="flex-1 min-h-[300px] h-[300px] relative z-10 overflow-visible"></div>
             
-            <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
+            <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between group">
               <div class="flex items-center gap-2">
-                <Cpu class="w-4 h-4 text-eco-green-500" />
-                <span class="text-gray-500 uppercase tracking-tighter text-xs">AI 产量预测</span>
+                <Cpu class="w-4 h-4 text-eco-green-500 animate-pulse" />
+                <span class="text-gray-500 uppercase tracking-tighter text-[10px]">AI 产量预测</span>
               </div>
-              <span class="text-eco-green-500 font-mono text-sm font-bold">Q3 预期产量: +12.4%</span>
+              <PretextBubble 
+                text="+12.4%" 
+                fontSize="12px Orbitron" 
+                :paddingX="12" 
+                :paddingY="4"
+                theme="green"
+                className="!bg-eco-green-500/10 !border-none !shadow-none !p-1 !rounded-md"
+              >
+                <template #label>Q3 预期</template>
+              </PretextBubble>
             </div>
 
           </section>
@@ -395,13 +417,25 @@ onUnmounted(() => {
               <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
               <span class="text-earth-gold-400 font-bold text-lg tracking-wider">AI 预警中枢</span>
             </div>
-            <div class="flex flex-col gap-1 text-xs">
-              <div class="flex items-center gap-2 text-red-400">
-                <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                <span>局部湿度异常 (提前量: 45min)</span>
-              </div>
-              <div class="text-gray-400 pl-3.5 mt-1">
-                建议: 开启 3 号区自动化排灌系统
+            <div class="flex flex-col gap-3 relative z-10">
+              <div class="p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex flex-col gap-2">
+                <div class="flex items-center gap-2 text-red-400">
+                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                  <span class="font-bold text-[10px] uppercase tracking-wider">局部湿度异常警告</span>
+                </div>
+                <div class="pl-3.5 border-l border-red-500/30 py-1">
+                   <PretextBubble 
+                    text="开启 3 号区自动化排灌系统" 
+                    fontSize="13px 'Noto Sans SC'" 
+                    :maxWidth="220" 
+                    :paddingX="0" 
+                    :paddingY="0"
+                    theme="blue"
+                    className="!bg-transparent !border-none !shadow-none !p-0 !rounded-none !text-gray-300"
+                  >
+                    <template #label>AI 决策建议 (提前 45min)</template>
+                  </PretextBubble>
+                </div>
               </div>
             </div>
           </section>
@@ -510,9 +544,14 @@ onUnmounted(() => {
   50% { opacity: 0.3; transform: scale(1.1); }
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+@keyframes ray-trace {
+  0% { transform: scaleX(0); opacity: 0; }
+  50% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+
+.animate-ray-trace {
+  animation: ray-trace 4s ease-in-out infinite;
 }
 
 .animate-float {
