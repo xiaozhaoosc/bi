@@ -113,35 +113,51 @@ const initCharts = () => {
     }]
   })
 
-  growthChart = echarts.init(document.getElementById('growthChart'))
-  growthChart.setOption({
-    grid: { top: 20, bottom: 30, left: 40, right: 10 },
-    xAxis: { type: 'category', data: ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满'], axisLabel: { color: '#888' } },
-    yAxis: { type: 'value', axisLabel: { color: '#888' }, splitLine: { lineStyle: { color: '#333' } } },
-    series: [{
-      data: [25, 32, 40, 55, 65, 80, 90, 95],
-      type: 'line',
-      smooth: true,
-      symbol: 'circle',
-      symbolSize: 6,
-      color: '#00ff88',
-      lineStyle: { 
-        color: '#00ff88', 
-        width: 2
+  const growthChartDom = document.getElementById('growthChart')
+  if (growthChartDom) {
+    growthChart = echarts.init(growthChartDom)
+    growthChart.setOption({
+      backgroundColor: 'transparent',
+      grid: { top: 20, bottom: 30, left: 40, right: 10 },
+      xAxis: { 
+        type: 'category', 
+        data: ['立春', '雨水', '惊蛰', '春分', '清明', '谷雨', '立夏', '小满'], 
+        axisLabel: { color: '#888' },
+        axisLine: { lineStyle: { color: '#444' } }
       },
-      itemStyle: { 
+      yAxis: { 
+        type: 'value', 
+        axisLabel: { color: '#888' }, 
+        splitLine: { lineStyle: { color: '#333' } },
+        axisLine: { lineStyle: { color: '#444' } }
+      },
+      series: [{
+        data: [25, 32, 40, 55, 65, 80, 90, 95],
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
         color: '#00ff88',
-        borderColor: '#00ff88',
-        borderWidth: 1
-      },
-      areaStyle: {
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'rgba(0, 255, 136, 0.3)' },
-          { offset: 1, color: 'rgba(0, 255, 136, 0.05)' }
-        ])
-      }
-    }]
-  })
+        lineStyle: { 
+          color: '#00ff88', 
+          width: 3
+        },
+        itemStyle: { 
+          color: '#00ff88',
+          borderColor: '#00ff88',
+          borderWidth: 2,
+          shadowBlur: 10,
+          shadowColor: '#00ff88'
+        },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(0, 255, 136, 0.3)' },
+            { offset: 1, color: 'rgba(0, 255, 136, 0.05)' }
+          ])
+        }
+      }]
+    })
+  }
 }
 
 const handleResize = () => {
@@ -155,9 +171,19 @@ onMounted(() => {
   updateTime()
   updateScale()
   setInterval(updateTime, 1000)
-  initCharts()
   window.addEventListener('resize', handleResize)
   document.addEventListener('fullscreenchange', handleFullscreenChange)
+  
+  // 确保DOM完全渲染后再初始化图表
+  setTimeout(() => {
+    initCharts()
+    // 再次调整大小确保图表正确显示
+    setTimeout(() => {
+      ecoChart?.resize()
+      diversityChart?.resize()
+      growthChart?.resize()
+    }, 100)
+  }, 100)
 })
 
 onUnmounted(() => {
@@ -231,6 +257,8 @@ onUnmounted(() => {
             <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-white/10 rounded-tl-lg"></div>
             <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-white/10 rounded-br-lg"></div>
           </section>
+
+          <MicroClimateChart />
 
           <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex flex-col gap-2 mb-4 relative z-10">
@@ -328,16 +356,13 @@ onUnmounted(() => {
             <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
             <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
 
-            <!-- Time-space Travel Slider -->
-            <div class="absolute bottom-4 w-[600px] z-30">
-               <TimelineSlider :options="timelineOptions" v-model="currentTimelineIndex" />
-            </div>
+
           </div>
         </main>
 
         <!-- Right Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
+          <section class="glass-panel rounded-3xl p-6 flex-[1.5] flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-4 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -353,7 +378,7 @@ onUnmounted(() => {
               <LightFlow :intensity="80" color="#00ff88" />
             </div>
 
-            <div id="growthChart" class="flex-1 min-h-0 relative z-10"></div>
+            <div id="growthChart" class="flex-1 min-h-[300px] h-[300px] relative z-10"></div>
             
             <div class="mt-2 p-3 bg-white/5 border border-white/10 rounded-xl flex items-center justify-between">
               <div class="flex items-center gap-2">
@@ -364,8 +389,6 @@ onUnmounted(() => {
             </div>
 
           </section>
-
-          <MicroClimateChart />
 
           <section class="glass-panel rounded-3xl p-6 border-t border-white/20 relative">
             <div class="flex items-center gap-2 mb-4">
