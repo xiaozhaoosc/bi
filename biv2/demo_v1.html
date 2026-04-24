@@ -29,16 +29,18 @@
             overflow: hidden;
             background-image: 
                 radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 80%),
-                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 204, 51, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
         .container {
             display: grid;
-            grid-template-columns: 400px 1fr 400px;
-            grid-template-rows: 100px 1fr 200px;
+            grid-template-columns: 420px 1fr 420px;
+            grid-template-rows: 120px 1fr 220px;
             height: 100vh;
-            padding: 20px;
-            gap: 20px;
+            padding: 24px;
+            gap: 24px;
         }
 
         /* Header */
@@ -47,57 +49,124 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            padding: 0 40px;
-            border-bottom: 1px solid var(--glass-border);
+            background: linear-gradient(135deg, rgba(10, 17, 24, 0.9), rgba(10, 17, 24, 0.6));
+            backdrop-filter: blur(20px);
+            padding: 0 48px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.05), transparent);
+            transform: rotate(45deg);
+            animation: headerFlow 15s linear infinite;
+        }
+
+        .title-group {
+            position: relative;
+            z-index: 1;
         }
 
         .title-group h1 {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            letter-spacing: 4px;
-            background: linear-gradient(45deg, var(--eco-green), var(--tech-blue));
+            font-size: 2.8rem;
+            letter-spacing: 6px;
+            background: linear-gradient(45deg, var(--eco-green), var(--tech-blue), var(--earth-gold));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+            animation: titleGradient 3s ease-in-out infinite;
         }
 
         .status-group {
             display: flex;
-            gap: 30px;
-            font-size: 0.9rem;
+            gap: 40px;
+            font-size: 1rem;
             color: var(--tech-blue);
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--tech-blue);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .status-item span {
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
         }
 
         /* Sidebar Panels */
         .panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
             animation: fadeIn 1s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--eco-green), transparent);
         }
 
         .panel-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--earth-gold);
             border-left: 4px solid var(--eco-green);
-            padding-left: 10px;
-            margin-bottom: 10px;
+            padding-left: 12px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .panel-title span {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--tech-blue);
             font-weight: normal;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
         }
 
         /* Center Content */
@@ -106,6 +175,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .center-stage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
         }
 
         .hologram-container {
@@ -117,20 +201,47 @@
             align-items: center;
         }
 
+        .hologram-slider {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hologram-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .hologram-slide.active {
+            opacity: 1;
+        }
+
         .hologram-img {
-            max-width: 90%;
-            max-height: 90%;
-            filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.5));
-            animation: float 6s ease-in-out infinite;
+            max-width: 95%;
+            max-height: 95%;
+            filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.6));
+            animation: float 8s ease-in-out infinite;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
         }
 
         .hologram-base {
             position: absolute;
-            bottom: 10%;
+            bottom: 8%;
             width: 60%;
-            height: 20px;
-            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+            height: 24px;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.5) 0%, transparent 70%);
             transform: rotateX(60deg);
+            animation: basePulse 3s ease-in-out infinite;
         }
 
         /* Bottom Value Ring */
@@ -138,75 +249,209 @@
             grid-column: 1 / 4;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 24px;
         }
 
         .value-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(5px);
-            border-radius: 10px;
-            padding: 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 20px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
+            justify-content: center;
+            gap: 16px;
+            transition: all 0.4s ease;
+            box-shadow: 0 12px 40px rgba(0, 255, 136, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: bubbleFlow 10s linear infinite;
         }
 
         .value-card:hover {
-            border-bottom-color: var(--eco-green);
-            background: rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            transform: translateY(-8px);
+            box-shadow: 0 16px 60px rgba(0, 255, 136, 0.15);
+            border-color: var(--eco-green);
         }
 
         .value-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 255, 136, 0.1);
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 212, 255, 0.1));
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.5rem;
+            font-size: 2.2rem;
             color: var(--eco-green);
+            z-index: 1;
+            position: relative;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .value-info {
+            text-align: center;
+            z-index: 1;
+            position: relative;
         }
 
         .value-info h4 {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #ccc;
+            margin-bottom: 8px;
+            font-weight: 400;
         }
 
         .value-info .number {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             font-family: 'Orbitron', sans-serif;
             color: #fff;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
 
         /* Charts */
         .chart-container {
             flex: 1;
-            min-height: 200px;
+            min-height: 220px;
+            position: relative;
+            z-index: 1;
         }
 
+        /* AI Warning */
+        .ai-warning {
+            background: linear-gradient(135deg, rgba(255, 77, 79, 0.1), rgba(255, 77, 79, 0.05));
+            border: 1px solid rgba(255, 77, 79, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 16px rgba(255, 77, 79, 0.1);
+        }
+
+        .ai-warning p:first-child {
+            color: #ff4d4f;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .ai-warning p:last-child {
+            color: #aaa;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
+            color: var(--tech-blue);
+            margin-right: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.2));
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+        }
+
+        /* Animations */
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            33% { transform: translateY(-20px) rotateY(5deg); }
+            66% { transform: translateY(-10px) rotateY(-5deg); }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-20px); }
+            from { opacity: 0; transform: translateX(-30px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Responsive Tags */
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            background: rgba(0, 212, 255, 0.2);
-            color: var(--tech-blue);
-            margin-right: 5px;
+        @keyframes bubbleFlow {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        @keyframes headerFlow {
+            0% { transform: rotate(45deg) translateX(-100%); }
+            100% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        @keyframes titleGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes basePulse {
+            0%, 100% { opacity: 0.5; transform: rotateX(60deg) scale(1); }
+            50% { opacity: 0.8; transform: rotateX(60deg) scale(1.05); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1600px) {
+            .container {
+                grid-template-columns: 380px 1fr 380px;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .title-group h1 {
+                font-size: 2.4rem;
+                letter-spacing: 4px;
+            }
+
+            .status-group {
+                gap: 30px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .container {
+                grid-template-columns: 340px 1fr 340px;
+                grid-template-rows: 100px 1fr 200px;
+                padding: 16px;
+                gap: 16px;
+            }
+
+            .title-group h1 {
+                font-size: 2rem;
+                letter-spacing: 3px;
+            }
+
+            .status-group {
+                gap: 20px;
+                font-size: 0.8rem;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .value-card {
+                padding: 20px;
+            }
         }
     </style>
 </head>
@@ -218,10 +463,19 @@
                 <h1>时茗园 · 生态守护全景</h1>
             </div>
             <div class="status-group">
-                <div>温度: <span style="color: var(--eco-green)">22°C</span></div>
-                <div>湿度: <span style="color: var(--eco-green)">65%</span></div>
-                <div>天气: <span style="color: var(--earth-gold)">晴转多云</span></div>
-                <div id="datetime">2026-04-24 12:23:45</div>
+                <div class="status-item">
+                    <span>温度:</span>
+                    <span style="color: var(--eco-green)">22°C</span>
+                </div>
+                <div class="status-item">
+                    <span>湿度:</span>
+                    <span style="color: var(--eco-green)">65%</span>
+                </div>
+                <div class="status-item">
+                    <span>天气:</span>
+                    <span style="color: var(--earth-gold)">晴转多云</span>
+                </div>
+                <div class="status-item" id="datetime">2026-04-24 12:23:45</div>
             </div>
         </header>
 
@@ -235,9 +489,9 @@
             <div class="panel-title">
                 生物多样性丰度
             </div>
-            <div style="font-size: 0.85rem; color: #aaa;">
+            <div style="font-size: 0.9rem; color: #aaa; position: relative; z-index: 1;">
                 <p><span class="tag">声纹识别</span> 检测到珍稀鸟类: 3种</p>
-                <p style="margin-top: 5px;"><span class="tag">影像追踪</span> 活跃物种: 42种</p>
+                <p style="margin-top: 8px;"><span class="tag">影像追踪</span> 活跃物种: 42种</p>
             </div>
             <div id="diversityChart" class="chart-container"></div>
         </aside>
@@ -245,7 +499,14 @@
         <!-- Center: Holographic Sand Table -->
         <main class="center-stage">
             <div class="hologram-container">
-                <img src="tea_garden_hologram.png" alt="Tea Garden Hologram" class="hologram-img">
+                <div class="hologram-slider">
+                    <div class="hologram-slide active">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=A%20futuristic%20holographic%20tea%20garden%20with%20digital%20overlays%2C%20showing%20plant%20health%20metrics%20and%20environmental%20data%2C%20blue%20and%20green%20glowing%20effects%2C%203D%20visualization%2C%20high-tech%20smart%20agriculture&image_size=landscape_16_9" alt="Tea Garden Hologram 1" class="hologram-img">
+                    </div>
+                    <div class="hologram-slide">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=A%20beautiful%20tea%20garden%20with%20advanced%20sensors%20and%20holographic%20projections%2C%20showing%20real-time%20data%20visualization%2C%20lush%20green%20tea%20bushes%2C%20high-tech%20agriculture%20system&image_size=landscape_16_9" alt="Tea Garden Hologram 2" class="hologram-img">
+                    </div>
+                </div>
                 <div class="hologram-base"></div>
             </div>
         </main>
@@ -264,9 +525,9 @@
             <div class="panel-title">
                 AI 预警中枢
             </div>
-            <div style="background: rgba(255, 77, 79, 0.1); border: 1px solid rgba(255, 77, 79, 0.3); padding: 10px; border-radius: 8px; font-size: 0.85rem;">
-                <p style="color: #ff4d4f;">● 局部湿度异常 (提前量: 45min)</p>
-                <p style="color: #aaa; font-size: 0.75rem;">建议: 开启 3 号区自动化排灌系统</p>
+            <div class="ai-warning">
+                <p>● 局部湿度异常 (提前量: 45min)</p>
+                <p>建议: 开启 3 号区自动化排灌系统，调节湿度至适宜范围，防止病虫害滋生。</p>
             </div>
         </aside>
 
@@ -332,8 +593,8 @@
                     value: [85, 92, 98, 90, 88],
                     name: '当前状态',
                     areaStyle: { color: 'rgba(0, 255, 136, 0.2)' },
-                    lineStyle: { color: 'rgba(0, 255, 136, 0.8)' },
-                    itemStyle: { color: '#00ff88' }
+                    lineStyle: { color: 'rgba(0, 255, 136, 0.8)', width: 2 },
+                    itemStyle: { color: '#00ff88', borderWidth: 2, borderColor: '#fff' }
                 }]
             }]
         });
@@ -352,6 +613,17 @@
                         { offset: 0, color: '#00d4ff' },
                         { offset: 1, color: '#00ff88' }
                     ])
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#00ff88' },
+                            { offset: 1, color: '#00d4ff' }
+                        ])
+                    }
+                },
+                animationDelay: function (idx) {
+                    return idx * 100;
                 }
             }]
         });
@@ -366,9 +638,19 @@
                 data: [45, 60, 85, 95],
                 type: 'line',
                 smooth: true,
-                areaStyle: { opacity: 0.1 },
-                lineStyle: { width: 3, color: '#ffcc33' },
-                itemStyle: { color: '#ffcc33' }
+                areaStyle: { 
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(255, 204, 51, 0.3)' },
+                        { offset: 1, color: 'rgba(255, 204, 51, 0.05)' }
+                    ])
+                },
+                lineStyle: { width: 4, color: '#ffcc33' },
+                itemStyle: { color: '#ffcc33', borderWidth: 2, borderColor: '#fff' },
+                symbol: 'circle',
+                symbolSize: 8,
+                animationDelay: function (idx) {
+                    return idx * 150;
+                }
             }]
         });
 
@@ -382,8 +664,17 @@
                 min: 0,
                 max: 100,
                 splitNumber: 5,
-                progress: { show: true, width: 8, itemStyle: { color: '#00d4ff' } },
-                axisLine: { lineStyle: { width: 8, color: [[1, '#111']] } },
+                progress: { 
+                    show: true, 
+                    width: 10, 
+                    itemStyle: { 
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: '#00d4ff' },
+                            { offset: 1, color: '#00ff88' }
+                        ])
+                    }
+                },
+                axisLine: { lineStyle: { width: 10, color: [[1, '#111']] } },
                 axisTick: { show: false },
                 splitLine: { show: false },
                 axisLabel: { show: false },
@@ -392,20 +683,45 @@
                 detail: {
                     valueAnimation: true,
                     offsetCenter: [0, -10],
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: '700',
                     color: '#fff',
-                    formatter: '{value}%'
+                    formatter: '{value}%',
+                    textShadowBlur: 10,
+                    textShadowColor: 'rgba(0, 255, 136, 0.5)'
                 },
                 data: [{ value: 82.5 }]
             }]
         });
 
+        // Image Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hologram-slide');
+        
+        function nextSlide() {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        
+        setInterval(nextSlide, 6000);
+
+        // Resize Charts
         window.addEventListener('resize', () => {
             ecoChart.resize();
             diversityChart.resize();
             growthChart.resize();
             climateChart.resize();
+        });
+
+        // Add scroll effect for panels
+        window.addEventListener('scroll', () => {
+            const panels = document.querySelectorAll('.panel');
+            panels.forEach((panel, index) => {
+                const rect = panel.getBoundingClientRect();
+                const opacity = Math.max(0, 1 - (rect.top / window.innerHeight));
+                panel.style.opacity = opacity;
+            });
         });
     </script>
 </body>
