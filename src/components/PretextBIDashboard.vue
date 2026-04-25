@@ -62,6 +62,13 @@ let ecoChart: echarts.ECharts | null = null
 let diversityChart: echarts.ECharts | null = null
 let growthChart: echarts.ECharts | null = null
 
+const handleFirstClick = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {})
+  }
+  window.removeEventListener('click', handleFirstClick)
+}
+
 const toggleFullscreen = () => {
   if (!isFullscreen.value) {
     document.documentElement.requestFullscreen()
@@ -240,9 +247,12 @@ onMounted(() => {
       growthChart?.resize()
     }, 100)
   }, 100)
+
+  window.addEventListener('click', handleFirstClick)
 })
 
 onUnmounted(() => {
+  window.removeEventListener('click', handleFirstClick)
   window.removeEventListener('resize', handleResize)
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
   ecoChart?.dispose()
