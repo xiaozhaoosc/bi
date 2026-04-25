@@ -109,7 +109,7 @@ onUnmounted(() => {
   <div class="h-full glass-panel rounded-xl p-3 flex flex-col" style="min-height: 340px;">
     <h3 class="text-base font-semibold text-earth-gold-400 mb-2 flex items-center gap-2">
       <span class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></span>
-      生物多样性丰度
+      生物多样性
     </h3>
     <div ref="chartRef" class="flex-1"></div>
     <div class="flex justify-around mt-2 text-xs">

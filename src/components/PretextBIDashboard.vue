@@ -320,7 +320,7 @@ onUnmounted(() => {
             <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性丰度</span>
+                <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性</span>
               </div>
             </div>
 
@@ -359,7 +359,7 @@ onUnmounted(() => {
         <!-- Center Stage -->
         <main class="col-span-6 relative perspective-lg preserve-3d">
           <!-- 3D Tea Garden Model - 填满中心区域，避开底部栏 -->
-          <div class="absolute inset-0 pb-[175px] p-3 flex items-center justify-center">
+          <div class="absolute inset-0 pb-[220px] p-3 flex items-center justify-center">
             <div class="w-full h-full max-w-none overflow-hidden rounded-2xl relative">
               <img
                 src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png"
@@ -524,10 +524,10 @@ onUnmounted(() => {
             <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
 
           <!-- 底部信息栏：微气候平衡度 + AI预警 + 多媒体区域 -->
-          <div class="absolute bottom-0 inset-x-0 flex gap-2 z-30">
+          <div class="absolute bottom-0 inset-x-0 flex gap-2 z-30 h-[210px]">
             <MicroClimateChart class="flex-1" />
             
-            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1">
+            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1 flex flex-col">
               <div class="flex items-center gap-1.5 mb-1">
                 <div class="w-1 h-3.5 bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
                 <span class="text-earth-gold-400 font-bold text-xs tracking-wider">AI 预警中枢</span>
@@ -536,18 +536,32 @@ onUnmounted(() => {
                   <span class="text-red-400 text-[9px] font-mono">LIVE</span>
                 </div>
               </div>
-              <div class="flex flex-col gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">
-                  <svg class="w-2.5 h-2.5 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
-                  <span>局部湿度异常 (45min)</span>
+              
+              <div class="flex-1 flex flex-col gap-1.5 justify-center">
+                <div class="flex flex-col gap-1 text-[11px]">
+                  <div class="flex items-center gap-1.5 text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">
+                    <svg class="w-2.5 h-2.5 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
+                    <span>局部湿度异常 (45min)</span>
+                  </div>
                 </div>
-                <div class="text-gray-400 pl-1 text-[9px] border-l-2 border-red-500/30">
-                  建议: 开启 3 号区排灌系统
+
+                <div class="flex flex-col gap-1.5 text-xs">
+                  <div class="flex items-center gap-2 text-red-400 bg-red-500/10 px-2 py-1 rounded-lg">
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
+                    <span>局部湿度异常 (提前量: 45min)</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-yellow-400/80 bg-yellow-500/5 px-2 py-1 rounded-lg">
+                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>
+                    <span>土壤 pH 偏移预警</span>
+                  </div>
+                  <div class="text-gray-400 pl-2 text-[10px] mt-0.5 border-l-2 border-red-500/30">
+                    建议: 开启 3 号区自动化排灌系统
+                  </div>
                 </div>
               </div>
             </section>
 
-            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1">
+            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1 flex flex-col">
               <div class="flex items-center gap-1.5 mb-1">
                 <div class="w-1 h-3.5 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
                 <span class="text-earth-gold-400 font-bold text-xs tracking-wider">茶园实况</span>
@@ -556,7 +570,7 @@ onUnmounted(() => {
                   <span class="text-red-400 text-[9px] font-mono">REC</span>
                 </div>
               </div>
-              <div class="relative rounded-lg overflow-hidden bg-black/40" style="aspect-ratio: 16/9;">
+              <div class="flex-1 relative rounded-lg overflow-hidden bg-black/40">
                 <video
                   src="/videos/茶园茶山.mp4"
                   autoplay
@@ -573,7 +587,7 @@ onUnmounted(() => {
 
         <!-- Right Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
-          <section class="glass-panel rounded-3xl p-6 flex-[2] flex flex-col overflow-hidden border-t border-white/20 relative">
+          <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
@@ -606,7 +620,7 @@ onUnmounted(() => {
 
           </section>
 
-          <div class="flex-1 min-h-[180px]">
+          <div class="flex-1 flex flex-col min-h-[180px]">
             <SensorDensityChart />
           </div>
         </aside>

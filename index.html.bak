@@ -432,7 +432,7 @@
             <!-- <img src="/biv2/a_high_fidelity_3d_holographic_model_of_a_lush_green_mountain_landscape_with.png" alt="Eco Mountain" class="panel-img"> -->
             <div id="ecoChart" class="chart-container"></div>
             <div class="panel-title">
-                生物多样性丰度
+                生物多样性
             </div>
             <div style="font-size: 0.85rem; color: #aaa;">
                 <p><span class="tag">声纹识别</span> 检测到珍稀鸟类: 3种</p>
