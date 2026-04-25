@@ -28,7 +28,7 @@ onUnmounted(() => {
 <template>
   <div class="w-full h-screen bg-dark-bg-200 overflow-hidden flex flex-col">
     <!-- Overlay Navigation (Minimal) -->
-    <nav class="fixed top-6 right-6 z-50 flex gap-2 bg-black/40 backdrop-blur-xl p-1 rounded-xl border border-white/10">
+    <!-- <nav class="fixed top-6 right-6 z-50 flex gap-2 bg-black/40 backdrop-blur-xl p-1 rounded-xl border border-white/10">
       <button
         @click="currentPage = 'dashboard'"
         :class="['p-2 rounded-lg transition-all',
@@ -47,7 +47,7 @@ onUnmounted(() => {
       >
         <MessageSquare class="w-5 h-5" />
       </button>
-    </nav>
+    </nav> -->
 
     <main class="flex-1 relative overflow-hidden">
       <Transition name="fade" mode="out-in">

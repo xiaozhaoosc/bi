@@ -260,11 +260,11 @@ onUnmounted(() => {
 
     <div 
       ref="dashboardRef"
-      class="dashboard-content w-[1920px] h-[1080px] p-8 flex flex-col relative"
+      class="dashboard-content w-[1920px] h-[1080px] p-7 flex flex-col relative"
       :style="{ transform: `scale(${scale})` }"
     >
       <!-- Header -->
-      <header class="flex justify-between items-start mb-10">
+      <header class="flex justify-between items-start mb-9">
         <div class="flex flex-col gap-2">
           <h1 class="text-4xl font-bold tracking-[4px] bg-gradient-to-r from-eco-green-400 to-smart-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,136,0.3)] font-['Orbitron']">
             时茗园 · 生态守护全景
@@ -283,9 +283,9 @@ onUnmounted(() => {
         </div>
       </header>
 
-      <div class="grid grid-cols-12 gap-8 flex-1 min-h-0">
+      <div class="grid grid-cols-12 gap-4 flex-1 min-h-0">
         <!-- Left Panel -->
-        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
+        <aside class="col-span-3 flex flex-col gap-4 overflow-hidden">
           <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
@@ -359,7 +359,7 @@ onUnmounted(() => {
         <!-- Center Stage -->
         <main class="col-span-6 relative perspective-lg preserve-3d">
           <!-- 3D Tea Garden Model - 填满中心区域，避开底部栏 -->
-          <div class="absolute inset-0 pb-[220px] p-3 flex items-center justify-center">
+          <div class="absolute inset-0 pb-[230px] p-1 flex items-center justify-center overflow-hidden">
             <div class="w-full h-full max-w-none overflow-hidden rounded-2xl relative">
               <img
                 src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png"
@@ -586,7 +586,7 @@ onUnmounted(() => {
         </main>
 
         <!-- Right Panel -->
-        <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
+        <aside class="col-span-3 flex flex-col gap-4 overflow-hidden">
           <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
             <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
