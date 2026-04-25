@@ -8,6 +8,7 @@ import SensorDensityChart from './SensorDensityChart.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
 // import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
+const base = import.meta.env.BASE_URL
 
 // 状态管理
 const isFullscreen = ref(false)
@@ -362,7 +363,7 @@ onUnmounted(() => {
           <div class="absolute inset-0 pb-[230px] p-1 flex items-center justify-center overflow-hidden">
             <div class="w-full h-full max-w-none overflow-hidden rounded-2xl relative">
               <img
-                src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png"
+                :src="`${base}images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png`"
                 alt="Tea Garden Digital Twin"
                 class="w-full h-full object-cover filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
               />
@@ -572,7 +573,7 @@ onUnmounted(() => {
               </div>
               <div class="flex-1 relative rounded-lg overflow-hidden bg-black/40">
                 <video
-                  src="/videos/茶园茶山.mp4"
+                  :src="`${base}videos/茶园茶山.mp4`"
                   autoplay
                   loop
                   muted

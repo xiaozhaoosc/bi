@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Monitor, MessageSquare } from 'lucide-vue-next'
+// import { Monitor, MessageSquare } from 'lucide-vue-next'
 import PretextBIDashboard from './components/PretextBIDashboard.vue'
 import PretextOptimizedBubbles from './components/PretextOptimizedBubbles.vue'
 
