@@ -245,21 +245,44 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section class="glass-panel rounded-3xl p-4 border-t border-white/20 relative h-full">
-    <div class="flex items-center gap-2 mb-2">
-      <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
-      <span class="text-earth-gold-400 font-bold text-base tracking-wider">微气候平衡度</span>
+  <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative h-full flex flex-col">
+    <!-- 标题栏 -->
+    <div class="flex items-center justify-between mb-0.5">
+      <div class="flex items-center gap-2">
+        <div class="w-1 h-4 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
+        <span class="text-earth-gold-400 font-bold text-sm tracking-wider">微气候平衡度</span>
+      </div>
     </div>
-    <div class="flex items-center gap-3">
-      <div class="text-2xl font-bold text-smart-blue-400">{{ balance }}%</div>
-      <div class="flex flex-col gap-1 text-xs">
-        <div class="flex items-center gap-2">
-          <div class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></div>
-          <span class="text-gray-400">光照: <span class="text-earth-gold-400 font-bold">{{ light.toFixed(1) }}%</span></span>
+
+    <!-- 主体：左侧仪表盘 + 右侧指标 -->
+    <div class="flex flex-1 min-h-0 gap-3">
+      <!-- 左侧：仪表盘 -->
+      <div class="flex-1 relative min-h-0">
+        <div ref="chartRef" class="w-full h-full"></div>
+        <!-- 中心数值覆盖 -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="text-center">
+            <div class="font-['Orbitron'] font-black text-3xl text-smart-blue-400 drop-shadow-[0_0_12px_rgba(59,130,246,0.5)]">{{ balance }}</div>
+            <div class="text-[10px] text-gray-500 font-mono tracking-wider">%</div>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="w-1.5 h-1.5 rounded-full bg-eco-green-500 animate-pulse" style="animation-delay: 0.3s"></div>
-          <span class="text-gray-400">CO₂: <span class="text-eco-green-400 font-bold">{{ co2.toFixed(0) }}ppm</span></span>
+      </div>
+
+      <!-- 右侧：子指标 -->
+      <div class="flex flex-col justify-center gap-2 w-[100px] shrink-0">
+        <div>
+          <div class="flex items-center gap-1 text-[10px] text-gray-500 mb-0.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-earth-gold-400 animate-pulse"></div>
+            光照
+          </div>
+          <div class="font-['Orbitron'] font-bold text-lg text-earth-gold-400">{{ light.toFixed(0) }}<span class="text-[10px] ml-0.5">%</span></div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1 text-[10px] text-gray-500 mb-0.5">
+            <div class="w-1.5 h-1.5 rounded-full bg-eco-green-400 animate-pulse" style="animation-delay: 0.3s"></div>
+            CO₂
+          </div>
+          <div class="font-['Orbitron'] font-bold text-lg text-eco-green-400">{{ co2.toFixed(0) }}<span class="text-[10px] ml-0.5">ppm</span></div>
         </div>
       </div>
     </div>

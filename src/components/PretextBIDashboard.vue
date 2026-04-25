@@ -99,7 +99,9 @@ const initCharts = () => {
         { name: '水质指标', max: 100 },
         { name: '生态平衡', max: 100 }
       ],
-      name: { textStyle: { color: '#888', fontSize: 12 } },
+      radius: '65%',
+      center: ['50%', '55%'],
+      name: { textStyle: { color: '#888', fontSize: 11 } },
       splitArea: { show: false },
       axisLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.3)' } },
       splitLine: { lineStyle: { color: 'rgba(0, 255, 136, 0.1)' } }
@@ -112,6 +114,32 @@ const initCharts = () => {
         lineStyle: { color: 'rgba(0, 255, 136, 0.8)', width: 2 },
         itemStyle: { color: '#00ff88' }
       }]
+    }],
+    graphic: [{
+      type: 'text',
+      left: 'center',
+      top: '52%',
+      style: {
+        text: '94.5',
+        fontSize: 28,
+        fill: '#00ff88',
+        fontWeight: 'bold',
+        fontFamily: 'Orbitron',
+        shadowColor: 'rgba(0, 255, 136, 0.8)',
+        shadowBlur: 20,
+        textAlign: 'center'
+      }
+    }, {
+      type: 'text',
+      left: 'center',
+      top: '66%',
+      style: {
+        text: '综合评分',
+        fontSize: 10,
+        fill: '#888',
+        fontFamily: 'Noto Sans SC',
+        textAlign: 'center'
+      }
     }]
   })
 
@@ -259,14 +287,17 @@ onUnmounted(() => {
         <!-- Left Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
           <section class="glass-panel rounded-3xl p-6 flex-[1.2] flex flex-col overflow-hidden border-t border-white/20 relative">
-            <div class="flex items-center justify-between mb-2 relative z-10">
+            <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
                 <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生态健康指数</span>
               </div>
-              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
-                实时评分: 94.5
-              </div>
+            </div>
+
+            <!-- 核心指标数值展示 -->
+            <div class="flex items-baseline gap-2 mb-1 relative z-10">
+              <span class="font-['Orbitron'] font-black text-4xl text-eco-green-400 drop-shadow-[0_0_15px_rgba(0,255,136,0.6)]">94.5</span>
+              <span class="text-smart-blue-400 text-xs font-mono tracking-wider">实时评分</span>
             </div>
             
             <!-- Scanning Line Animation from backup style -->
@@ -286,19 +317,34 @@ onUnmounted(() => {
           </section>
 
           <section class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden border-t border-white/20 relative">
-            <div class="flex flex-col gap-2 mb-4 relative z-10">
+            <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
                 <span class="text-earth-gold-400 font-bold text-lg tracking-wider">生物多样性丰度</span>
               </div>
-              <div class="flex flex-col gap-1 mt-2 text-xs">
+            </div>
+
+            <!-- 核心指标数值展示 -->
+            <div class="flex items-baseline gap-2 mb-1 relative z-10">
+              <span class="font-['Orbitron'] font-black text-4xl text-eco-green-400 drop-shadow-[0_0_15px_rgba(0,255,136,0.6)]">260</span>
+              <span class="text-smart-blue-400 text-xs font-mono tracking-wider">活跃物种</span>
+              <span class="ml-auto flex items-center gap-1 text-xs text-eco-green-400">
+                <svg class="w-3 h-3" viewBox="0 0 12 12" fill="currentColor"><path d="M6 2L10 8H2L6 2Z"/></svg>
+                +12.4%
+              </span>
+            </div>
+
+            <div class="flex flex-col gap-1 mb-3 text-[11px] relative z-10">
+              <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">声纹识别</span>
-                  <span class="text-gray-400">检测到珍稀鸟类: <span class="text-white">3种</span></span>
+                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded text-[10px]">声纹识别</span>
+                  <span class="text-gray-500">珍稀鸟类: <span class="text-white font-bold">3种</span></span>
                 </div>
+              </div>
+              <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded">影像追踪</span>
-                  <span class="text-gray-400">活跃物种: <span class="text-white">42种</span></span>
+                  <span class="px-1.5 py-0.5 bg-smart-blue-500/20 text-smart-blue-400 rounded text-[10px]">影像追踪</span>
+                  <span class="text-gray-500">监测物种: <span class="text-white font-bold">42种</span></span>
                 </div>
               </div>
             </div>
@@ -312,27 +358,26 @@ onUnmounted(() => {
 
         <!-- Center Stage -->
         <main class="col-span-6 relative perspective-lg preserve-3d">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <!-- 3D Tea Garden Model -->
-            <div class="absolute inset-0 flex items-center justify-center">
-              <div class="relative w-[600px] h-[600px] flex items-center justify-center">
-                <img 
-                  src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png" 
-                  alt="Tea Garden Digital Twin" 
-                  class="max-w-full max-h-full object-contain filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
-                />
-                <!-- Digital Grid Overlay -->
-                <div class="absolute inset-0 pointer-events-none">
-                  <div class="w-full h-full border border-eco-green-400/30 rounded-lg"></div>
-                  <div class="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none">
-                    <div v-for="i in 100" :key="i" class="border border-eco-green-400/10"></div>
-                  </div>
+          <!-- 3D Tea Garden Model - 填满中心区域，避开底部栏 -->
+          <div class="absolute inset-0 pb-[175px] p-3 flex items-center justify-center">
+            <div class="w-full h-full max-w-none overflow-hidden rounded-2xl relative">
+              <img
+                src="/images/a_high_fidelity_3d_digital_twin_of_a_lush_green_tea_garden_landscape_isolated.png"
+                alt="Tea Garden Digital Twin"
+                class="w-full h-full object-cover filter drop-shadow-[0_0_30px_rgba(0,255,136,0.5)] animate-float"
+              />
+              <!-- Digital Grid Overlay -->
+              <div class="absolute inset-0 pointer-events-none">
+                <div class="w-full h-full border border-eco-green-400/30 rounded-lg"></div>
+                <div class="absolute inset-0 grid grid-cols-10 grid-rows-10 pointer-events-none">
+                  <div v-for="i in 100" :key="i" class="border border-eco-green-400/10"></div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Pretext Bubbles - 增强版 -->
-            <div class="absolute inset-0 pointer-events-none">
+          <!-- Pretext Bubbles - 增强版 -->
+          <div class="absolute inset-0 pointer-events-none">
               <!-- SVG 连接线动画层 -->
               <svg class="absolute inset-0 w-full h-full" viewBox="0 0 960 800" preserveAspectRatio="xMidYMid meet">
                 <!-- 左上气泡连接线 -->
@@ -474,49 +519,44 @@ onUnmounted(() => {
               </div>
             </div>
 
+            <!-- 装饰背景效果 -->
             <div class="w-[800px] h-[800px] bg-gradient-to-b from-eco-green-500/10 to-transparent rounded-full blur-[150px] animate-pulse"></div>
             <div class="hologram-base w-[700px] h-[60px] bg-eco-green-500/20 absolute bottom-16 blur-3xl transform rotateX(80deg)"></div>
 
-          </div>
-
           <!-- 底部信息栏：微气候平衡度 + AI预警 + 多媒体区域 -->
-          <div class="absolute bottom-0 inset-x-0 flex gap-3 z-30">
+          <div class="absolute bottom-0 inset-x-0 flex gap-2 z-30">
             <MicroClimateChart class="flex-1" />
             
-            <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
-              <div class="flex items-center gap-2 mb-2">
-                <div class="w-1 h-4 bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
-                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">AI 预警中枢</span>
-                <div class="ml-auto flex items-center gap-1">
-                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                  <span class="text-red-400 text-[10px] font-mono">LIVE</span>
+            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1">
+              <div class="flex items-center gap-1.5 mb-1">
+                <div class="w-1 h-3.5 bg-red-500 shadow-[0_0_8px_#ef4444]"></div>
+                <span class="text-earth-gold-400 font-bold text-xs tracking-wider">AI 预警中枢</span>
+                <div class="ml-auto flex items-center gap-0.5">
+                  <div class="w-1 h-1 rounded-full bg-red-500 animate-pulse"></div>
+                  <span class="text-red-400 text-[9px] font-mono">LIVE</span>
                 </div>
               </div>
-              <div class="flex flex-col gap-1.5 text-xs">
-                <div class="flex items-center gap-2 text-red-400 bg-red-500/10 px-2 py-1 rounded-lg">
-                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
-                  <span>局部湿度异常 (提前量: 45min)</span>
+              <div class="flex flex-col gap-1 text-[11px]">
+                <div class="flex items-center gap-1.5 text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">
+                  <svg class="w-2.5 h-2.5 shrink-0" viewBox="0 0 12 12" fill="currentColor"><path d="M6 1L11 10H1L6 1Z"/></svg>
+                  <span>局部湿度异常 (45min)</span>
                 </div>
-                <div class="flex items-center gap-2 text-yellow-400/80 bg-yellow-500/5 px-2 py-1 rounded-lg">
-                  <svg class="w-3 h-3 shrink-0" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>
-                  <span>土壤 pH 偏移预警</span>
-                </div>
-                <div class="text-gray-400 pl-2 text-[10px] mt-0.5 border-l-2 border-red-500/30">
-                  建议: 开启 3 号区自动化排灌系统
+                <div class="text-gray-400 pl-1 text-[9px] border-l-2 border-red-500/30">
+                  建议: 开启 3 号区排灌系统
                 </div>
               </div>
             </section>
 
-            <section class="glass-panel rounded-2xl p-3 border-t border-white/20 relative flex-1">
-              <div class="flex items-center gap-2 mb-2">
-                <div class="w-1 h-4 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
-                <span class="text-earth-gold-400 font-bold text-sm tracking-wider">茶园实况</span>
-                <div class="ml-auto flex items-center gap-1">
-                  <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
-                  <span class="text-red-400 text-[10px] font-mono">REC</span>
+            <section class="glass-panel rounded-2xl p-2.5 border-t border-white/20 relative flex-1">
+              <div class="flex items-center gap-1.5 mb-1">
+                <div class="w-1 h-3.5 bg-smart-blue-500 shadow-[0_0_8px_#3b82f6]"></div>
+                <span class="text-earth-gold-400 font-bold text-xs tracking-wider">茶园实况</span>
+                <div class="ml-auto flex items-center gap-0.5">
+                  <div class="w-1 h-1 rounded-full bg-red-500 animate-pulse"></div>
+                  <span class="text-red-400 text-[9px] font-mono">REC</span>
                 </div>
               </div>
-              <div class="relative rounded-xl overflow-hidden bg-black/40" style="aspect-ratio: 16/9;">
+              <div class="relative rounded-lg overflow-hidden bg-black/40" style="aspect-ratio: 16/9;">
                 <video
                   src="/videos/茶园茶山.mp4"
                   autoplay
@@ -534,13 +574,23 @@ onUnmounted(() => {
         <!-- Right Panel -->
         <aside class="col-span-3 flex flex-col gap-8 overflow-hidden">
           <section class="glass-panel rounded-3xl p-6 flex-[2] flex flex-col overflow-hidden border-t border-white/20 relative">
-            <div class="flex items-center justify-between mb-4 relative z-10">
+            <div class="flex items-center justify-between mb-1 relative z-10">
               <div class="flex items-center gap-2">
                 <div class="w-1 h-5 bg-eco-green-500 shadow-[0_0_8px_#00ff88]"></div>
                 <span class="text-earth-gold-400 font-bold text-lg tracking-wider">智慧生长图谱</span>
               </div>
-              <div class="text-smart-blue-400 text-sm font-mono tracking-widest">
-                AI 决策建议
+              <span class="text-smart-blue-400 text-xs font-mono tracking-wider">AI 决策建议</span>
+            </div>
+
+            <!-- 核心指标数值展示 -->
+            <div class="flex items-baseline gap-3 mb-1 relative z-10">
+              <span class="font-['Orbitron'] font-black text-4xl text-eco-green-400 drop-shadow-[0_0_15px_rgba(0,255,136,0.6)]">95</span>
+              <div class="flex flex-col">
+                <span class="text-smart-blue-400 text-[11px] font-mono">当前指数</span>
+                <span class="text-eco-green-400 text-xs flex items-center gap-0.5">
+                  <svg class="w-2.5 h-2.5" viewBox="0 0 12 12" fill="currentColor"><path d="M6 2L10 8H2L6 2Z"/></svg>
+                  +12.4%
+                </span>
               </div>
             </div>
 
