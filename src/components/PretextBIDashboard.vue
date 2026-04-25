@@ -4,9 +4,9 @@ import { Fullscreen, Minimize2, Cpu } from 'lucide-vue-next'
 import * as echarts from 'echarts'
 import MicroClimateChart from './MicroClimateChart.vue'
 import SensorDensityChart from './SensorDensityChart.vue'
-import LightFlow from './visuals/LightFlow.vue'
+// import LightFlow from './visuals/LightFlow.vue'
 import EcoScanner from './visuals/EcoScanner.vue'
-import TimelineSlider from './visuals/TimelineSlider.vue'
+// import TimelineSlider from './visuals/TimelineSlider.vue'
 import EcoGalaxy from './visuals/EcoGalaxy.vue'
 
 // 状态管理
@@ -14,7 +14,7 @@ const isFullscreen = ref(false)
 const currentTime = ref('')
 const dashboardRef = ref<HTMLElement | null>(null)
 const scale = ref(1)
-const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
+// const timelineOptions = ['谷雨 (Q1)', '立夏 (Q2)', '小满 (Q3)', '芒种 (Q4)']
 const currentTimelineIndex = ref(0)
 
 // 模拟不同节气的数据
@@ -186,7 +186,7 @@ const initCharts = () => {
         axisLine: { lineStyle: { color: '#444' } }
       },
       series: [{
-        data: [25, 32, 40, 55, 65, 80, 90, 95],
+        data: [46, 32, 40, 91, 65, 80, 90, 83],
         type: 'line',
         smooth: true,
         symbol: 'circle',
